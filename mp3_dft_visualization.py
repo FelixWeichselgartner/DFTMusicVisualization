@@ -35,6 +35,7 @@ import ffmpeg
 #+ for windows: 
 #download https://ffmpeg.zeranoe.com/builds/
 #and add to path
+from NumpyToWAV import ConvertNumpyToWav
 
 def plot(filename, signal, fourier, maximum):
     """plots the original signal along with the frequencies of that signal
@@ -171,6 +172,8 @@ def main():
     print('this is the led matrix:')
     print('the value is the height and the x-position represents the frequency')
     print(ledMatrix)
+
+    ConvertNumpyToWav('part', signal)
 
     #play(song)
 

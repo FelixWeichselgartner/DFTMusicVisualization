@@ -10,10 +10,10 @@ double arctan2(double x, double y) {
     if (x>0) {
         return atan(y/x);
     } else if (x<0) {
-        if (y>0)
+        if (y>0) {
             return atan(y/x)+pi;
         } else if (y==0) {
-            return pi
+            return pi;
         } else if (y<0) {
             return atan(y/x)-pi;
         }
@@ -29,19 +29,19 @@ double arctan2(double x, double y) {
 }
 
 double angle(double complex X){
-    return arctan2(creal(X), cimag(X))
+    return arctan2(creal(X), cimag(X));
 }
 
 void dft(double *x, int N, double complex *X) {
     X = malloc(N * sizeof(double complex));
-    double complex wExponent = 1*I*(-2)*pi/(N)
+    double complex wExponent = 1*I*(-2)*pi/(N);
     double complex temp;
     for (int l = 0; l < N; l++) {
-        temp = 0
+        temp = 0;
         for (int k = 0; k < N; k++) {
-            temp = x[k]*exp(wExponent*k*l) + temp
+            temp = x[k]*exp(wExponent*k*l) + temp;
         }
-        X[l] = temp/N
+        X[l] = temp/N;
     }
 }
 
@@ -58,7 +58,7 @@ void fft(double *x, int N, double complex *X) {
     }
 
     //fourier transform those both parts
-    double *XS, *XSS, *X;
+    double complex *XS = malloc(max * sizeof(double complex)), *XSS = malloc(max * sizeof(double complex));
     dft(xs, max, XS);
     dft(xss, max, XSS);
 
@@ -66,14 +66,18 @@ void fft(double *x, int N, double complex *X) {
     X = malloc(N * sizeof(double complex));
     complex double wExponent = 1*I*2*pi/N*(-1);
 
+    printf("%lf, %lf\n", creal(X[0]), cimag(X[0]));
+    printf("%lf, %lf\n", creal(XS[0]), cimag(XS[0]));
+    printf("%lf, %lf\n", creal(XSS[0]), cimag(XSS[0]));
+
     for (int l = 0; l < max; l++) {
         X[l] = (XS[l] + exp(wExponent*l)*XSS[l])/2;
     }
 
-    l = 0
     for (int l = 0; l < max; l++) {
         X[l + max] = (XS[l] - exp(wExponent*l)*XSS[l])/2;
     }
+
     free(xs); free(xss); free(XS); free(XSS);
 }
 
@@ -89,14 +93,14 @@ void zeroPaddingToNextPOW2N(double *function, int N) {
     while (N > pow(2, n)) {
         n++;
     }
-    int add = pow(2, n) - N
+    int add = pow(2, n) - N;
     zeroPadding(function, add, N);
 }
 
 double * vonHann(double alpha, double beta, int N) {
     double *vonHann = malloc(N * sizeof(double));
     for (int n = 0; n < N; n++) {
-        vonHann[n] = alpha - beta * cos(2 * pi * n / (N - 1))
+        vonHann[n] = alpha - beta * cos(2 * pi * n / (N - 1));
     }
     return vonHann;
 }

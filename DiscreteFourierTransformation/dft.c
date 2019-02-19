@@ -5,6 +5,29 @@
 
 #define pi 3.14159265358979323846
 
+double absoluteComplex(double x, double y) {
+    return sqrt(x * x + y * y);
+}
+
+void ConsoleDArray(double *x, int length) {
+    printf("double array: ");
+    for (int i = 0; i < length; i++)
+    {
+        printf("%lf ", x[i]);
+    }
+    printf("\n\n");
+}
+
+void ConsoleCArray(double complex *x, int length) {
+    printf("double absolute: \n");
+    for (int i = 0; i < length; i++)
+    {
+        //printf("%i: %lf, %lf;\n", i, creal(x[i]), cimag(x[i]));
+        printf("%lf ", absoluteComplex(creal(x[i]), cimag(x[i])));
+    }
+    printf("\n\n");
+}
+
 double arctan2(double x, double y) {
     //values = ]-pi;pi]
     if (x>0) {
@@ -32,20 +55,29 @@ double angle(double complex X){
     return arctan2(creal(X), cimag(X));
 }
 
-void dft(double *x, int N, double complex *X) {
+double complex * dft(double *x, int N) {
+    double complex *X;
     X = malloc(N * sizeof(double complex));
     double complex wExponent = 1*I*(-2)*pi/(N);
     double complex temp;
     for (int l = 0; l < N; l++) {
-        temp = 0;
+        temp = 0 + 0 * I;
         for (int k = 0; k < N; k++) {
-            temp = x[k]*exp(wExponent*k*l) + temp;
+            temp = x[k]*cexp(wExponent*k*l) + temp;
         }
         X[l] = temp/N;
     }
+
+    /*
+    printf("\ndft\n");
+    ConsoleCArray(X, N);
+    printf("\n");
+    */
+
+    return X;
 }
 
-void fft(double *x, int N, double complex *X) {
+double complex * fft(double *x, int N) {
     int max = N/2;
 
     //decimation in time
@@ -58,27 +90,24 @@ void fft(double *x, int N, double complex *X) {
     }
 
     //fourier transform those both parts
-    double complex *XS = malloc(max * sizeof(double complex)), *XSS = malloc(max * sizeof(double complex));
-    dft(xs, max, XS);
-    dft(xss, max, XSS);
+    double complex *XS, *XSS;
+    XS = dft(xs, max);
+    XSS = dft(xss, max);
 
     //add both together to actual fourier transformation
-    X = malloc(N * sizeof(double complex));
+    double complex *X = malloc(N * sizeof(double complex));
     complex double wExponent = 1*I*2*pi/N*(-1);
 
-    printf("%lf, %lf\n", creal(X[0]), cimag(X[0]));
-    printf("%lf, %lf\n", creal(XS[0]), cimag(XS[0]));
-    printf("%lf, %lf\n", creal(XSS[0]), cimag(XSS[0]));
-
     for (int l = 0; l < max; l++) {
-        X[l] = (XS[l] + exp(wExponent*l)*XSS[l])/2;
+        X[l] = (XS[l] + cexp(wExponent*l)*XSS[l])/2;
     }
 
     for (int l = 0; l < max; l++) {
-        X[l + max] = (XS[l] - exp(wExponent*l)*XSS[l])/2;
+        X[l + max] = (XS[l] - cexp(wExponent*l)*XSS[l])/2;
     }
 
     free(xs); free(xss); free(XS); free(XSS);
+    return X;
 }
 
 void zeroPadding(double *function, int N, int n) {

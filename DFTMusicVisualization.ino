@@ -1,5 +1,5 @@
 #include <FastLED.h>
-#define NUM_LEDS 64
+#define NUM_LEDS 192
 #define DATA_PIN 6
 #define Helligkeit1 10
 #define Helligkeit2 20
@@ -8,7 +8,7 @@
 
 CRGB leds[NUM_LEDS];
 
-int array[8]={8, 8, 8, 8, 8, 8, 8, 8};
+int array[12]={8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8};
 
 void setup() { 
   FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
@@ -17,22 +17,22 @@ void setup() {
 }
 
 void ausgabe(int *array){
-  for(int i=0; i<8; i++){
+  for(int i=0; i<12; i++){
     if(array[i]!=0){
       for(int j=0; j<array[i]; j++){
-        leds[j+i*8]=CRGB::Blue;
-        leds[0]=CRGB::Blue;
+        leds[j+i*12]=CRGB::Blue;
+        leds[24*8-j]=CRGB::Blue;
      }
      for(int j=array[i]; j<8; j++){
-       leds[j+i*8]=CRGB::Black;
-       leds[0]=CRGB::Blue;
+       leds[j+i*12]=CRGB::Black;
+       leds[24*8-j]=CRGB::Blue;
       }
    }
    if(array[i]==0){
     for(int j=0; j<8; j++){
-     leds[i*8]=CRGB::Black;
-     leds[0]=CRGB::Black;
-    }
+     leds[i*12]=CRGB::Black;
+     leds[24*8-i*12]=CRGB::Black;
+     }
    }
   }
 }

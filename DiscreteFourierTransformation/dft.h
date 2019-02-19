@@ -3,13 +3,19 @@
 
 #include <complex.h>
 
+double absoluteComplex(double, double);
+
+void ConsoleDArray(double *, int);
+
+void ConsoleCArray(double complex *, int);
+
 double arctan2(double, double);
 
 double angle(double complex);
 
-void dft(double *, int, double complex *);
+double complex * dft(double *, int);
 
-void fft(double *, int, double complex *);
+double complex * fft(double *, int, double complex *);
 
 void zeroPadding(double *, int, int);
 

@@ -6,34 +6,33 @@
 
 #define pi 3.14159265358979323846
 
-//gcc .\USAGE_of_dft.c .\dft.c -o .\USAGE_of_dft.ex
+//gcc .\USAGE_of_dft.c .\dft.c -o .\USAGE_of_dft.exe
 
 void error() {
     printf("error!");
 }
 
 void main() {
-    double *signal;
+    float *signal;
     int length = 8;
-    double inkrement = 2*pi/length;
-    double n = 0;
-    signal = malloc(length * sizeof(double));
+    float inkrement = 2*pi/length;
+    float n = 0;
+    signal = malloc(length * sizeof(float));
+
     if (signal == NULL) {
         error();
         return;
     }
-    printf("original signal: ");
+
+    printf("original signal: \n");
     for (int i = 0; i < length; i++) {
         signal[i] = sin(n)*5;
         n += inkrement;
     }
     ConsoleDArray(signal, length);
 
-    double complex *XDFT, *XFFT;
-    if (XDFT == NULL || XFFT == NULL) {
-        error();
-        return;
-    }
+    float complex *XDFT, *XFFT;
+
     XDFT = dft(signal, length);
     printf("DFT: \n");
     ConsoleCArray(XDFT, length);

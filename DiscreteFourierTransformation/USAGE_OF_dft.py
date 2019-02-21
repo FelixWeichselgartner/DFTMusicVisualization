@@ -198,7 +198,66 @@ def AC_TEST_with_zero_padding():
 
     plt.plot(x, X, max(x))
 
+def INT_TEST():
+    print('INT TEST:\n\n')   
+
+    #signal x
+    x = []
+
+    #making signal a sine wave 
+    amount = 8
+    n = 0
+    inkrement = 1
+    i = 0
+    for i in range(amount):
+        x.append(n)
+        n = n + inkrement
+
+    N = len(x)
+
+    #Diskrete-Fourier-Transformation
+    X = around(dft(x), decimals=6)
+
+    print('Diskrete-Fourier-Transformation:')
+    print(f'X = {X}\n')
+
+    #amplitude and phase
+    A = [None] * N
+    p = [None] * N
+    i = 0
+    for i in range(len(X)):
+        temp1 = abs(X[i])
+        A[i] = temp1
+        temp2 = angle(X[i])
+        p[i] = temp2
+        #print(p[i])
+    
+    print(f'Amplitude: A = {A}')
+    print(f'Phase: p = {p}\n\n')
+
+    #Fast-Fourier-Transformation
+    X2 = around(fft(x), decimals=6)
+
+    print('Fast-Fourier-Transformation:')
+    print(f'X2 = {X2}\n')
+
+    #amplitude and phase
+    A2 = [None] * N
+    p2 = [None] * N
+    i = 0
+    for i in range(len(X2)):
+        temp1 = abs(X2[i])
+        A2[i] = temp1
+        temp2 = angle(X[i])
+        p2[i] = temp2
+    
+    print(f'Amplitude: A2 = {A2}')
+    print(f'Phase: p2 = {p2}\n\n\n')
+
+    plt.plot(x, X, max(x))
+
 if __name__ == "__main__":
-    DC_TEST()
-    AC_TEST()
-    AC_TEST_with_zero_padding()
+    #DC_TEST()
+    #AC_TEST()
+    #AC_TEST_with_zero_padding()
+    INT_TEST()

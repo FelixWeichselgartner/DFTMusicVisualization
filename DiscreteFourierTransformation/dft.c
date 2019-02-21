@@ -5,12 +5,12 @@
 
 #define pi 3.14159265358979323846
 
-double absoluteComplex(double x, double y) {
+float absoluteComplex(float x, float y) {
     return sqrt(x * x + y * y);
 }
 
-void ConsoleDArray(double *x, int length) {
-    printf("double array: ");
+void ConsoleDArray(float *x, int length) {
+    printf("float array: ");
     for (int i = 0; i < length; i++)
     {
         printf("%lf ", x[i]);
@@ -18,8 +18,8 @@ void ConsoleDArray(double *x, int length) {
     printf("\n\n");
 }
 
-void ConsoleCArray(double complex *x, int length) {
-    printf("double absolute: \n");
+void ConsoleCArray(float complex *x, int length) {
+    printf("float absolute: \n");
     for (int i = 0; i < length; i++)
     {
         //printf("%i: %lf, %lf;\n", i, creal(x[i]), cimag(x[i]));
@@ -28,7 +28,7 @@ void ConsoleCArray(double complex *x, int length) {
     printf("\n\n");
 }
 
-double arctan2(double x, double y) {
+float arctan2(float x, float y) {
     //values = ]-pi;pi]
     if (x>0) {
         return atan(y/x);
@@ -51,15 +51,15 @@ double arctan2(double x, double y) {
     }
 }
 
-double angle(double complex X){
+float angle(float complex X){
     return arctan2(creal(X), cimag(X));
 }
 
-double complex * dft(double *x, int N) {
-    double complex *X;
-    X = malloc(N * sizeof(double complex));
-    double complex wExponent = 1*I*(-2)*pi/(N);
-    double complex temp;
+float complex * dft(float *x, int N) {
+    float complex *X;
+    X = malloc(N * sizeof(float complex));
+    float complex wExponent = 1*I*(-2)*pi/(N);
+    float complex temp;
     for (int l = 0; l < N; l++) {
         temp = 0 + 0 * I;
         for (int k = 0; k < N; k++) {
@@ -68,21 +68,15 @@ double complex * dft(double *x, int N) {
         X[l] = temp/N;
     }
 
-    /*
-    printf("\ndft\n");
-    ConsoleCArray(X, N);
-    printf("\n");
-    */
-
     return X;
 }
 
-double complex * fft(double *x, int N) {
+float complex * fft(float *x, int N) {
     int max = N/2;
 
     //decimation in time
-    double *xs = malloc(max * sizeof(double));
-    double *xss = malloc(max * sizeof(double));
+    float *xs = malloc(max * sizeof(float));
+    float *xss = malloc(max * sizeof(float));
 
     for (int k = 0; k < max; k++) {
         xs[k] = x[2*k];
@@ -90,13 +84,13 @@ double complex * fft(double *x, int N) {
     }
 
     //fourier transform those both parts
-    double complex *XS, *XSS;
+    float complex *XS, *XSS;
     XS = dft(xs, max);
     XSS = dft(xss, max);
 
     //add both together to actual fourier transformation
-    double complex *X = malloc(N * sizeof(double complex));
-    complex double wExponent = 1*I*2*pi/N*(-1);
+    float complex *X = malloc(N * sizeof(float complex));
+    complex float wExponent = 1*I*2*pi/N*(-1);
 
     for (int l = 0; l < max; l++) {
         X[l] = (XS[l] + cexp(wExponent*l)*XSS[l])/2;
@@ -110,14 +104,14 @@ double complex * fft(double *x, int N) {
     return X;
 }
 
-void zeroPadding(double *function, int N, int n) {
-    function = (double *)realloc(function, n * sizeof(double));
+void zeroPadding(float *function, int N, int n) {
+    function = (float *)realloc(function, n * sizeof(float));
     for (int x = n - N; x < n; x++) {
         function[x] = 0; 
     }
 }
 
-void zeroPaddingToNextPOW2N(double *function, int N) {
+void zeroPaddingToNextPOW2N(float *function, int N) {
     int n = 1;
     while (N > pow(2, n)) {
         n++;
@@ -126,16 +120,16 @@ void zeroPaddingToNextPOW2N(double *function, int N) {
     zeroPadding(function, add, N);
 }
 
-double * vonHann(double alpha, double beta, int N) {
-    double *vonHann = malloc(N * sizeof(double));
+float * vonHann(float alpha, float beta, int N) {
+    float *vonHann = malloc(N * sizeof(float));
     for (int n = 0; n < N; n++) {
         vonHann[n] = alpha - beta * cos(2 * pi * n / (N - 1));
     }
     return vonHann;
 }
 
-double * hamming(int N) {
-    double alpha = 25.0/46;
-    double beta = 1 - alpha;
+float * hamming(int N) {
+    float alpha = 25.0/46;
+    float beta = 1 - alpha;
     return vonHann(alpha, beta , N);
 }

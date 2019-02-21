@@ -3,24 +3,24 @@
 
 #include <complex.h>
 
-double absoluteComplex(double, double);
+float absoluteComplex(float, float);
 
-void ConsoleDArray(double *, int);
+void ConsoleDArray(float *, int);
 
-void ConsoleCArray(double complex *, int);
+void ConsoleCArray(float complex *, int);
 
-double arctan2(double, double);
+float arctan2(float, float);
 
-double angle(double complex);
+float angle(float complex);
 
-double complex * dft(double *, int);
+float complex * dft(float *, int);
 
-double complex * fft(double *, int, double complex *);
+float complex * fft(float *, int, float complex *);
 
-void zeroPadding(double *, int, int);
+void zeroPadding(float *, int, int);
 
-void zeroPaddingToNextPOW2N(double *, int);
+void zeroPaddingToNextPOW2N(float *, int);
 
-double * hamming(int);
+float * hamming(int);
 
 #endif

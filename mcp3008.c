@@ -11,12 +11,13 @@ void loadSpiDriver() {
 	}
 }
 
-void spiSetup(int spiChannel) {
-    int spiClockSpeed = 1000000;
-	if ((myFd = wiringPiSPISetup(spiChannel, spiClockSpeed)) < 0) {
+int spiSetup(int spiChannel) {
+    int spiClockSpeed = 1000000, spi;
+	if ((spi = wiringPiSPISetup(spiChannel, spiClockSpeed)) < 0) {
 		printf("Can't open the SPI bus: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+    return spi;
 }
 
 int analogRead(int spiChannel, int channelConfig, int analogChannel) {

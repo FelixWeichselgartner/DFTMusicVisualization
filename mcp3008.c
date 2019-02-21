@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
-int myFd;
+int spi;
 
 void loadSpiDriver() {
 	if (system("gpio load spi") == -1) {

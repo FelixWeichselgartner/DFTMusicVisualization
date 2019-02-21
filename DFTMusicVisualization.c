@@ -12,7 +12,7 @@ const int length = ; //pow(2, n)
 int samplingFrequency = 2 * 20000;
 int deltaT = 1/samplingFrequency*1000*1000;
 int channel1 = 0, channel2 = 1;
-int spiChannel = 0, channelConfig = 8, spi;
+int spiChannel = 0, channelConfig = 8;
 short *signal;
 float complex *fourier;
 int display[ARRAYWIDTH];

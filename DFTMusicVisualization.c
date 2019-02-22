@@ -27,7 +27,7 @@ int integrate(int start, int end) {
     return retval;
 }
 
-void setup(int spiChannel) {
+void setup() {
     signal = malloc(length * sizeof(short));
     if (wiringPiSetup() == -1) {
 		printf("wiringPi Setup failed!\n");

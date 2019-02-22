@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <wiringPi.h>
+#include <wiringPiSPI.h>
 #include <errno.h>
-
-int spi;
 
 void loadSpiDriver() {
 	if (system("gpio load spi") == -1) {
@@ -20,7 +21,7 @@ int spiSetup(int spiChannel) {
     return spi;
 }
 
-int analogRead(int spiChannel, int channelConfig, int analogChannel) {
+int mcpAnalogRead(int spiChannel, int channelConfig, int analogChannel) {
 	unsigned char buffer[3] = { 1 };
 	buffer[1] = (channelConfig + analogChannel) << 4;
 	wiringPiSPIDataRW(spiChannel, buffer, 3);

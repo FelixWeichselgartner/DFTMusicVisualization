@@ -55,7 +55,7 @@ float angle(float complex X){
     return arctan2(creal(X), cimag(X));
 }
 
-float complex * dft(float *x, int N) {
+float complex * dft(short *x, int N) {
     float complex *X;
     X = malloc(N * sizeof(float complex));
     float complex wExponent = 1*I*(-2)*pi/(N);
@@ -71,12 +71,12 @@ float complex * dft(float *x, int N) {
     return X;
 }
 
-float complex * fft(float *x, int N) {
+float complex * fft(short *x, int N) {
     int max = N/2;
 
     //decimation in time
-    float *xs = malloc(max * sizeof(float));
-    float *xss = malloc(max * sizeof(float));
+    short *xs = malloc(max * sizeof(short));
+    short *xss = malloc(max * sizeof(short));
 
     for (int k = 0; k < max; k++) {
         xs[k] = x[2*k];

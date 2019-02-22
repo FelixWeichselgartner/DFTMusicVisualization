@@ -13,9 +13,9 @@ float arctan2(float, float);
 
 float angle(float complex);
 
-float complex * dft(float *, int);
+float complex * dft(short *, int);
 
-float complex * fft(float *, int, float complex *);
+float complex * fft(short *, int);
 
 void zeroPadding(float *, int, int);
 

@@ -1,16 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <math.h>
 #include <complex.h>
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 #include "DiscreteFourierTransformation/dft.h"
+#include "mcp3008.h"
 
 #define ARRAYWIDTH 12
+#define samplingFrequency 2*20000
+#define deltaT 1/samplingFrequency*1000*1000
 
-const int length = ; //pow(2, n)
-int samplingFrequency = 2 * 20000;
-int deltaT = 1/samplingFrequency*1000*1000;
+//compile command:
+//gcc DFTMusicVisualization.c DiscreteFourierTransformation/dft.c mcp3008.c -o DFTMusicVisualization -lm -lwiringPi
+
+static int spi;
+
+const int length = pow(2, 10); //pow(2, n)
 int channel1 = 0, channel2 = 1;
 int spiChannel = 0, channelConfig = 8;
 short *signal;
@@ -21,7 +28,7 @@ int norm8bit;
 
 int integrate(int start, int end) {
     int retval = 0;
-    for (int i = start, i < end; i++) {
+    for (int i = start; i < end; i++) {
         retval = fourier[i] + retval;
     }
     return retval;
@@ -30,19 +37,19 @@ int integrate(int start, int end) {
 void setup() {
     signal = malloc(length * sizeof(short));
     if (wiringPiSetup() == -1) {
-		printf("wiringPi Setup failed!\n");
-		exit(EXIT_FAILURE);
-	}
-	
-    //pinMode(gruen, OUTPUT);
-	//digitalWrite(gruen, LOW);
+	printf("wiringPi Setup failed!\n");
+	exit(EXIT_FAILURE);
+    }
 
-	*spi = spiSetup(spiChannel);
+    //pinMode(gruen, OUTPUT);
+    //digitalWrite(gruen, LOW);
+
+    spi = spiSetup(spiChannel);
 }
 
 void sample() {
     for (int i = 0; i < length; i++) {
-        signal[i] = (analogRead(spiChannel, channelConfig, channel1) + analogRead(spiChannel, channelConfig, channel2))/(2*norm);
+        signal[i] = (mcpAnalogRead(spiChannel, channelConfig, channel1) + mcpAnalogRead(spiChannel, channelConfig, channel2))/(2*norm);
         delayMicroseconds(deltaT);
     }
 }
@@ -83,7 +90,7 @@ void MatrixOutput() {
 void loop() {
     sample();
     fourier = fft(signal, length);
-    integrate();
+    FormToMatrix();
     normTo8Bit();
     ConsoleOutput();
     MatrixOutput();
@@ -92,11 +99,11 @@ void loop() {
 
 void main() {
     setup();
-    
+
     //while button wasnt pushed
     loop();
 
-    free(signal); free(X);
-    close(*spi);
+    free(signal); free(fourier);
+    close(spi);
     return;
 }

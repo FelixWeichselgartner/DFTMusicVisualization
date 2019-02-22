@@ -27,11 +27,11 @@ int norm = pow(2, 10-4); //pow(2, 4) = 8
 int norm8bit;
 
 int integrate(int start, int end) {
-    int retval = 0;
+    float retval = 0;
     for (int i = start; i < end; i++) {
-        retval = fourier[i] + retval;
+        retval = sqrt(creal(fourier[i])*creal(fourier[i]) + cimag(fourier[i])*cimag(fourier[i])) + retval;
     }
-    return retval;
+    return (int)retval;
 }
 
 void setup() {

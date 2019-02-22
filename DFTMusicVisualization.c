@@ -6,14 +6,14 @@
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 #include "DiscreteFourierTransformation/dft.h"
-#include "mcp3008.h"
+#include "mcp3008/mcp3008.h"
 
 #define ARRAYWIDTH 12
 #define samplingFrequency 2*20000
 #define deltaT 1/samplingFrequency*1000*1000
 
 //compile command:
-//gcc DFTMusicVisualization.c DiscreteFourierTransformation/dft.c mcp3008.c -o DFTMusicVisualization -lm -lwiringPi
+//gcc DFTMusicVisualization.c DiscreteFourierTransformation/dft.c mcp3008/mcp3008.c -o DFTMusicVisualization -lm -lwiringPi
 
 static int spi;
 

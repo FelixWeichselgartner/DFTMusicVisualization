@@ -8,10 +8,10 @@
 #include "DiscreteFourierTransformation/dft.h"
 #include "mcp3008/mcp3008.h"
 
-#define TestSoundSampling 1
-#if TestSoundSampling
+#define true 1
+#define false 0
+
 #include "ProofOfConceptFiles/analogInputTest.h"
-#endif
 
 #define ARRAYWIDTH 12
 #define samplingFrequency 2*20000
@@ -103,8 +103,8 @@ void loop() {
     free(fourier);
 }
 
-void TestSoundSampling() {
-    analogInputTest();
+void TestSoundSampling(int spiChannel, int channelConfig, int channel) {
+    analogInputTest(spiChannel, channelConfig, channel);
 }
 
 void main() {
@@ -117,7 +117,7 @@ void main() {
             loop();
         }
     } else {
-        TestSoundSampling(spiChannel, channelConfig, 0) {);
+        TestSoundSampling(spiChannel, channelConfig, 0);
     }
 
     free(signal); free(fourier);

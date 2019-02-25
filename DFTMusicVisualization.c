@@ -8,12 +8,18 @@
 #include "DiscreteFourierTransformation/dft.h"
 #include "mcp3008/mcp3008.h"
 
+#define TestSoundSampling 1
+#if TestSoundSampling
+#include "ProofOfConceptFiles/analogInputTest.h"
+#endif
+
 #define ARRAYWIDTH 12
 #define samplingFrequency 2*20000
 #define deltaT 1/samplingFrequency*1000*1000
 
 //compile command:
 //gcc DFTMusicVisualization.c DiscreteFourierTransformation/dft.c mcp3008/mcp3008.c -o DFTMusicVisualization -lm -lwiringPi
+//gcc DFTMusicVisualization.c DiscreteFourierTransformation/dft.c mcp3008/mcp3008.c ProofOfConceptFiles/tinywav/tinywav.c ProofOfConceptFiles/analogInputTest.c -o DFTMusicVisualization -lm -lwiringPi
 
 static int spi;
 
@@ -97,11 +103,22 @@ void loop() {
     free(fourier);
 }
 
+void TestSoundSampling() {
+    analogInputTest();
+}
+
 void main() {
+    short running = true;
     setup();
 
-    //while button wasnt pushed
-    loop();
+    if (!TestSoundSampling) {
+        //while button wasnt pushed
+        while(running) {
+            loop();
+        }
+    } else {
+        TestSoundSampling(spiChannel, channelConfig, 0) {);
+    }
 
     free(signal); free(fourier);
     close(spi);

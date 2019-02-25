@@ -19,7 +19,7 @@
 
 //compile command:
 //gcc DFTMusicVisualization.c DiscreteFourierTransformation/dft.c mcp3008/mcp3008.c -o DFTMusicVisualization -lm -lwiringPi
-//gcc DFTMusicVisualization.c DiscreteFourierTransformation/dft.c mcp3008/mcp3008.c ProofOfConceptFiles/tinywav/tinywav.c ProofOfConceptFiles/analogInputTest.c -o DFTMusicVisualization -lm -lwiringPi
+//gcc DFTMusicVisualization.c DiscreteFourierTransformation/dft.c mcp3008/mcp3008.c ProofOfConceptFiles/tinywav/tinywav.c ProofOfConceptFiles/analogInputTest.c -o DFTMusicVisualization -lm -lwiringPi -lrt
 
 static int spi;
 

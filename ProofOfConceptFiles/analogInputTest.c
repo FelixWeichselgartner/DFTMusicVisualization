@@ -1,7 +1,11 @@
+#include <stdio.h>
+#include <unistd.h>
+
 #include "tinywav/tinywav.h"
 #include "../mcp3008/mcp3008.h"
 #include <time.h>
 #include <wiringPi.h>
+#include <wiringPiSPI.h>
 
 #define NUM_CHANNELS 1
 #define SAMPLE_RATE 48000
@@ -17,7 +21,7 @@ void analogInputTest(int spiChannel, int channelConfig, int channel) {
 
     do {
         for (int k = 0; k < BLOCK_SIZE; k++) {
-            buffer[k] = mcpAnalogRead(spiChannel, channelConfig, channel);
+            buffer[k] = (float)mcpAnalogRead(spiChannel, channelConfig, channel)*5.0/1023;
 	    delayMicroseconds(delaytime);
         }
         tinywav_write_f(&tw, buffer, BLOCK_SIZE);
@@ -28,6 +32,14 @@ void analogInputTest(int spiChannel, int channelConfig, int channel) {
 }
 
 int main() {
-    analogInputTest.c();
+    static int spi;
+    int channel = 0, spiChannel = 0, channelConfig = 8;
+    if (wiringPiSetup() == -1) {
+        printf("setup failed\n");
+        return 0;
+    }
+    spi = spiSetup(spiChannel);
+    analogInputTest(spiChannel, channelConfig, channel);
+    close(spi);
     return 0;
 }

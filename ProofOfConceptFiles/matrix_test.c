@@ -37,8 +37,11 @@ program execution stops and cleans up after itself.
 #include "../lib/rpi_ws281x/gpio.h"
 #include "../lib/rpi_ws281x/dma.h"
 #include "../lib/rpi_ws281x/pwm.h"
-//#include "../lib/rpi_ws281x/version.h"
+#include "../lib/rpi_ws281x/version.h"
 #include "../lib/rpi_ws281x/ws2811.h"
+
+#define true 1
+#define false 0
 
 #define ARRAY_SIZE(stuff)       (sizeof(stuff) / sizeof(stuff[0]))
 
@@ -51,6 +54,8 @@ program execution stops and cleans up after itself.
 #define WIDTH                   8
 #define HEIGHT                  8
 #define LED_COUNT               (WIDTH * HEIGHT)
+
+int running = 1;
 
 int width = WIDTH;
 int height = HEIGHT;
@@ -99,7 +104,7 @@ ws2811_led_t dotcolors[] =
 void matrix_set() {
     for (int y = 0; y < (height - 1); y++) {
         for (int x = 0; x < width; x++) {
-            matrix[y * width + x] = dotcolors[x]
+            matrix[y * width + x] = dotcolors[x];
         }
     }
 }
@@ -120,20 +125,48 @@ void matrix_clear() {
     }
 }
 
+static void ctrl_c_handler(int signum) {
+    (void)(signum);
+    running = 0;
+}
+
+static void setup_handlers() {
+    struct sigaction sa = {
+        .sa_handler = ctrl_c_handler,
+    };
+
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+}
+
 int main() {
+    printf("you are running the matrix_test\n");
     short running = true;
     int sleeptime = 1000000 / 15;
 
     matrix = malloc(sizeof(ws2811_led_t) * width * height);
-    
-    ws2811_return_t ret;
-
-    if ((ret = ws2811_init(&ledstring)) != WS2811_SUCCESS) {
-        printf("failed to initialize\n");
-        return 1;
+    if (matrix == NULL) {
+	printf("failed to get heap memory\n");
+    } else {
+	printf("heap memory was reserved\n");
     }
 
+    setup_handlers();
+
+    ws2811_return_t ret;
+    ret = ws2811_init(&ledstring);
+    printf("we got so far - hold on!\n");
+    if (ret != WS2811_SUCCESS) {
+        printf("failed to initialize\n");
+        return 1;
+    } else {
+	printf("initialized the led string");
+    }
+
+    matrix_set();
+
     while (running) {
+	printf("run ");
         if ((ret = ws2811_render(&ledstring)) != WS2811_SUCCESS) {
             printf("failed to render\n");
             break;

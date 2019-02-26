@@ -10,6 +10,8 @@ file(GLOB SOURCES
     "mylib/DiscreteFourierTransformation/c/dft.h"
     "mylib/mcp3008/mcp3008.c"
     "mylib/mcp3008/mcp3008.h"
+    "mylib/matrix/matrix.c"
+    "mylib/matrix/matrix.h"
 )
  
 add_executable(DFTMusicVisualization ${SOURCES})

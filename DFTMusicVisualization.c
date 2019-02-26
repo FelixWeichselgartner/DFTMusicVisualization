@@ -8,13 +8,14 @@
 #include <wiringPiSPI.h>
 #include "mylib/DiscreteFourierTransformation/c/dft.h"
 #include "mylib/mcp3008/mcp3008.h"
+#include "mylib/matrix/matrix.h"
 
 #define true 1
 #define false 0
 
 #define debug true
 
-#define ARRAYWIDTH 12
+#define ARRAYWIDTH 8
 #define samplingFrequency 44100
 #define deltaT 1/samplingFrequency*1000*1000
 
@@ -89,7 +90,7 @@ void ConsoleOutput() {
 }
 
 void MatrixOutput() {
-    //output for display
+    myMatrixOutput(display);
 }
 
 void loop() {

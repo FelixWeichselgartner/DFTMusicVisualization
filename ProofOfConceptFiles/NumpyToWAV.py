@@ -1,9 +1,9 @@
 import numpy as np
 from scipy.io.wavfile import write
 
-def ConvertNumpyToWav(name, data):
+def ConvertNumpyToWav(name, data, frequency):
     scaled = np.int16(data/np.max(np.abs(data)) * 32767)
-    write(name + '.wav', 44100, scaled)
+    write(name + '.wav', frequency, scaled)
 
 def ConvertListToWav(name, theList):
     arr = np.zeros(len(theList))
@@ -11,7 +11,7 @@ def ConvertListToWav(name, theList):
     for i in theList:
         arr[count] = i
         count += 1
-    ConvertNumpyToWav(name, arr)
+    ConvertNumpyToWav(name, arr, 30000)
 
 
 def main():

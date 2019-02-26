@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 #include <math.h>
 #include <complex.h>
 #include <wiringPi.h>
@@ -11,10 +12,8 @@
 #define true 1
 #define false 0
 
-#include "ProofOfConceptFiles/analogInputTest.h"
-
 #define ARRAYWIDTH 12
-#define samplingFrequency 2*20000
+#define samplingFrequency 44100
 #define deltaT 1/samplingFrequency*1000*1000
 
 //compile command:
@@ -55,6 +54,9 @@ void setup() {
 
 void sample() {
     for (int i = 0; i < length; i++) {
+        //later:
+        //transform each channel on its own and display left channel on left side of matrix
+        //right channel on right side of the matrix
         signal[i] = (mcpAnalogRead(spiChannel, channelConfig, channel1) + mcpAnalogRead(spiChannel, channelConfig, channel2))/(2*norm);
         delayMicroseconds(deltaT);
     }
@@ -111,13 +113,9 @@ void main() {
     short running = true;
     setup();
 
-    if (!TestSoundSampling) {
-        //while button wasnt pushed
-        while(running) {
-            loop();
-        }
-    } else {
-        TestSoundSampling(spiChannel, channelConfig, 0);
+    //while button wasnt pushed
+    while(running) {
+        loop();
     }
 
     free(signal); free(fourier);

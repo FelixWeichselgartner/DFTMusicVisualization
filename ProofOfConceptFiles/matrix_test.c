@@ -33,15 +33,12 @@ program execution stops and cleans up after itself.
 #include <stdarg.h>
 #include <getopt.h>
 
-
-#include "rpi_ws281x/clk.h"
-#include "rpi_ws281x/gpio.h"
-#include "rpi_ws281x/dma.h"
-#include "rpi_ws281x/pwm.h"
-#include "rpi_ws281x/version.h"
-
-#include "rpi_ws281x/ws2811.h"
-
+#include "../lib/rpi_ws281x/clk.h"
+#include "../lib/rpi_ws281x/gpio.h"
+#include "../lib/rpi_ws281x/dma.h"
+#include "../lib/rpi_ws281x/pwm.h"
+//#include "../lib/rpi_ws281x/version.h"
+#include "../lib/rpi_ws281x/ws2811.h"
 
 #define ARRAY_SIZE(stuff)       (sizeof(stuff) / sizeof(stuff[0]))
 
@@ -72,7 +69,7 @@ ws2811_t ledstring =
             .gpionum = GPIO_PIN,
             .count = LED_COUNT,
             .invert = 0,
-            .brightness = 128, //255
+            .brightness = 255,
             .strip_type = STRIP_TYPE,
         },
         [1] =

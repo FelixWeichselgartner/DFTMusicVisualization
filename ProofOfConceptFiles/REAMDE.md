@@ -1,3 +1,4 @@
+run in the lib folder:
 ```
-git clone https://github.com/lieff/minimp3.git
+https://github.com/mhroth/tinywav
 ```

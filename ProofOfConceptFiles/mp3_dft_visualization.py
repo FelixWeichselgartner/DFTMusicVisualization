@@ -105,7 +105,7 @@ def main():
     those are then normed to 0 <= value <= 8 to be displayed on an led Matrix with size 8 on 8
     """
 
-    filename = 'inmymind.mp3'
+    filename = 'em.mp3'
     #filename = input('what is your filename?')
 
     song = AudioSegment.from_mp3(filename)
@@ -173,9 +173,9 @@ def main():
     print('the value is the height and the x-position represents the frequency')
     print(ledMatrix)
 
-    ConvertNumpyToWav('part', signal)
+    ConvertNumpyToWav('part', signal, 90000)
 
-    #play(song)
+    play(song)
 
 if __name__ == "__main__":
     main()

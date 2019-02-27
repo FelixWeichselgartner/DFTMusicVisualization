@@ -1,3 +1,8 @@
+/*
+this file is oriented on:
+https://github.com/jgarff/rpi_ws281x/blob/master/main.c
+*/
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -101,12 +106,33 @@ ws2811_led_t dotcolors_rgbw[] = {
 
 };
 
-void writeDisplayMatrix(int *display) {
-    for (int x = 0; x < width; x++) {
-	for (int y = 0; y < height; y++) {
-	    matrix[y * width + x] = dotcolors[0];
-	}
+void OnOff(int i, int v) {
+    if (v == 0 || v > 8 || v < 0) {
+        for (int k = 0; k < width; k++) {
+            matrix[i * width + k] = 0;
+        }
+    } else {
+        for (int k = 0; k < v; k++) {
+            matrix[i * width + k] = dotcolors[0];
+        }
+        for (int f = v; f < width; f++) {
+            matrix[i * width + f] = 0;
+        }
     }
+}
+
+void writeDisplayMatrix(int *display) {
+    for (int i = 0; i < width; i++) {
+        OnOff(i, display[i]);
+    }
+    
+    /*
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            matrix[y * width + x] = dotcolors[0];
+        }
+    }
+    */
 }
 
 static void ctrl_c_handler(int signum) {
@@ -123,35 +149,34 @@ static void setup_handlers() {
     sigaction(SIGTERM, &sa, NULL);
 }
 
-void myMatrixOutput(int *display) {
-    ws2811_return_t ret;
+static ws2811_return_t ret;
 
+void myMatrixSetup() {
     matrix = malloc(sizeof(ws2811_led_t) * width * height);
-
     setup_handlers();
 
     if ((ret = ws2811_init(&ledstring)) != WS2811_SUCCESS) {
         fprintf(stderr, "ws2811_init failed: %s\n", ws2811_get_return_t_str(ret));
         return;
     }
+}
 
+void myMatrixOutput(int *display) {
     writeDisplayMatrix(display);
     matrix_render();
 
     if ((ret = ws2811_render(&ledstring)) != WS2811_SUCCESS) {
-	fprintf(stderr, "ws2811_render failed: %s\n", ws2811_get_return_t_str(ret));
-	return;
+        fprintf(stderr, "ws2811_render failed: %s\n", ws2811_get_return_t_str(ret));
+        return;
     }
 
-    usleep(1000000 / 15);
+    return;
+}
 
+void myMatrixEnd() {
     matrix_clear();
     matrix_render();
     ws2811_render(&ledstring);
-
     free(matrix);
     ws2811_fini(&ledstring);
-
-    printf ("\n");
-    return;
 }

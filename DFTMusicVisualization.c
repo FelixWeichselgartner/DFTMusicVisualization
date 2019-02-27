@@ -40,14 +40,16 @@ int integrate(int start, int end) {
 void setup() {
     signal = malloc(length * sizeof(short));
     if (wiringPiSetup() == -1) {
-	printf("wiringPi Setup failed!\n");
-	exit(EXIT_FAILURE);
+        printf("wiringPi Setup failed!\n");
+        exit(EXIT_FAILURE);
     }
 
     //pinMode(gruen, OUTPUT);
     //digitalWrite(gruen, LOW);
 
     spi = spiSetup(spiChannel);
+
+    myMatrixSetup();
 }
 
 void sample() {
@@ -99,7 +101,7 @@ void loop() {
     FormToMatrix();
     normTo8Bit();
     if (debug) {
-	ConsoleOutput();
+	    ConsoleOutput();
     }
     MatrixOutput();
     free(fourier);
@@ -112,11 +114,12 @@ void main() {
     //while button wasnt pushed
     while(running) {
         loop();
-	if (debug) {
-	    delay(1);
-	}
+        if (debug) {
+            delay(1);
+        }
     }
 
+    myMatrixEnd();
     free(signal); free(fourier);
     close(spi);
     return;

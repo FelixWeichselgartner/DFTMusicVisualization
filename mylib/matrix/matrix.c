@@ -23,7 +23,6 @@ https://github.com/jgarff/rpi_ws281x/blob/master/main.c
 #include "../../lib/rpi_ws281x/version.h"
 #include "../../lib/rpi_ws281x/ws2811.h"
 
-
 #define ARRAY_SIZE(stuff)       (sizeof(stuff) / sizeof(stuff[0]))
 
 // defaults for cmdline options
@@ -33,6 +32,9 @@ https://github.com/jgarff/rpi_ws281x/blob/master/main.c
 //#define STRIP_TYPE            WS2811_STRIP_RGB		// WS2812/SK6812RGB integrated chip+leds
 #define STRIP_TYPE              WS2811_STRIP_GBR		// WS2812/SK6812RGB integrated chip+leds
 //#define STRIP_TYPE            SK6812_STRIP_RGBW		// SK6812RGBW (NOT SK6812RGB)
+
+//unknown so far
+#define LED_COUNT 0
 
 int width, height, led_count;
 
@@ -69,14 +71,13 @@ void matrix_render() {
 }
 
 void matrix_clear() {
-    for (int y = 0; y < (height ); y++) {
+    for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             matrix[y * width + x] = 0;
         }
     }
 }
 
-int dotspos[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
 ws2811_led_t dotcolors[] = {
     0x00200000,  // red
     0x00201000,  // orange
@@ -101,7 +102,7 @@ ws2811_led_t dotcolors_rgbw[] = {
 };
 
 void OnOff(int i, int v) {
-    if (v == 0 || v > 8 || v < 0) {
+    if (v == 0 || v > width || v < 0) {
         for (int k = 0; k < width; k++) {
             matrix[i * width + k] = 0;
         }
@@ -119,14 +120,6 @@ void writeDisplayMatrix(int *display) {
     for (int i = 0; i < width; i++) {
         OnOff(i, display[i]);
     }
-    
-    /*
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-            matrix[y * width + x] = dotcolors[0];
-        }
-    }
-    */
 }
 
 static void ctrl_c_handler(int signum) {
@@ -149,7 +142,8 @@ void myMatrixSetup(int w, int h) {
     width = w;
     height = h;
     led_count = width * height;
-    matrix = malloc(sizeof(ws2811_led_t) * width * height);
+    ledstring.channel[0].count = led_count;
+    matrix = malloc(sizeof(ws2811_led_t) * led_count);
     setup_handlers();
 
     if ((ret = ws2811_init(&ledstring)) != WS2811_SUCCESS) {

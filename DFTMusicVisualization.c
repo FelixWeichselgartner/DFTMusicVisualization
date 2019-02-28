@@ -17,14 +17,14 @@
 #define false 0
 
 //debug mode
-#define debug 2
+#define debug true
 
 //how much bits the adc got -> the more the better
 #define BITSOFADC 10
 
 //the width and height of your matrix setup
 #define ARRAYWIDTH 8
-#define ARRAYHEIGHT 8
+#define ARRAYHEIGHT 24
 
 //the sampling frequency with which the adc works
 #define samplingFrequency 44100
@@ -45,7 +45,7 @@ int spiChannel = 0, channelConfig = 8;
 short *signal;
 float complex *fourier;
 //contains the calculated information to display on the matrix
-int display[ARRAYWIDTH];
+int display[ARRAYHEIGHT];
 int norm = pow(2, 10-4); //pow(2, 4) = 8
 
 /**
@@ -69,10 +69,19 @@ int integrate(int start, int end) {
  * @retval None
  */
 void setup() {
+    printf("starting:\tallocating signal memory\n");
+
     signal = malloc(length * sizeof(short));
+
+    if (debug == true) {
+	printf("success:\tallocated signal memory\n");
+    }
+
     if (wiringPiSetup() == -1) {
         printf("wiringPi Setup failed!\n");
         exit(EXIT_FAILURE);
+    } else if (debug == true) {
+	printf("success:\twiringPi Setup was a success\n");
     }
 
     //pinMode(gruen, OUTPUT);
@@ -80,7 +89,10 @@ void setup() {
 
     spi = spiSetup(spiChannel);
 
-    myMatrixSetup();
+    myMatrixSetup(ARRAYWIDTH, ARRAYHEIGHT);
+    if (debug == true) {
+	printf("success:\tmy matrix setup\n");
+    }
 }
 
 /**
@@ -93,7 +105,7 @@ void sample() {
         //later:
         //transform each channel on its own and display left channel on left side of matrix
         //right channel on right side of the matrix
-        signal[i] = (mcpAnalogRead(spiChannel, channelConfig, channel1) + mcpAnalogRead(spiChannel, channelConfig, channel2))/(2);
+        signal[i] = (mcpAnalogRead(spiChannel, channelConfig, channel1) + mcpAnalogRead(spiChannel, channelConfig, channel2))/2;
         delayMicroseconds(deltaT);
     }
 }
@@ -105,9 +117,9 @@ void sample() {
  */
 void FormToMatrix() {
     int max = length*20000/samplingFrequency;
-    int step = max/ARRAYWIDTH;
+    int step = max/ARRAYHEIGHT;
     int start = 0, end = step;
-    for (int i = 0; i < ARRAYWIDTH; i++) {
+    for (int i = 0; i < ARRAYHEIGHT; i++) {
         display[i] = integrate(start, end);
         start += step;
         end += step;
@@ -120,23 +132,23 @@ void FormToMatrix() {
  * @retval None
  */
 void normTo8Bit() {
-    for (int i = 0; i < ARRAYWIDTH; i++) {
-        display[i] = display[i]*ARRAYHEIGHT/pow(2, BITSOFADC);
+    for (int i = 0; i < ARRAYHEIGHT; i++) {
+        display[i] = display[i]*ARRAYWIDTH/pow(2, BITSOFADC);
     }
 }
 
 /**
  * @brief  prints the display array to console -> only for debug mode
- * @note   
+ * @note
  * @retval None
  */
 void ConsoleOutput() {
     printf("Matrix:\n");
-    for(int i = 0; i < ARRAYWIDTH; i++) {
+    for(int i = 0; i < ARRAYHEIGHT; i++) {
         printf("%2i ", i);
     }
     printf("\n");
-    for(int i = 0; i < ARRAYWIDTH; i++) {
+    for(int i = 0; i < ARRAYHEIGHT; i++) {
         printf("%2i ", display[i]);
     }
     printf("\n");
@@ -148,6 +160,7 @@ void ConsoleOutput() {
  * @retval None
  */
 void MatrixOutput() {
+    printf("program going to matrix.c file now\n");
     myMatrixOutput(display);
 }
 
@@ -158,14 +171,32 @@ void MatrixOutput() {
  */
 void loop() {
     sample();
+    if (debug == true) {
+	printf("success:\tsample\n");
+    }
     fourier = fft(signal, length);
+    if (debug == true) {
+	printf("success:\tfourier\n");
+    }
     FormToMatrix();
+    if (debug == true) {
+	printf("success:\tform to matrix\n");
+    }
     normTo8Bit();
     if (debug == true) {
-	    ConsoleOutput();
+	printf("success:\tnorm to 8 bit\n");
+    }
+    if (debug == true) {
+	    //ConsoleOutput();
     }
     MatrixOutput();
+    if (debug == true) {
+	printf("success:\tmatrix output\n");
+    }
     free(fourier);
+    if (debug == true) {
+	printf("success:\tfreed fourier memory\n");
+    }
 }
 
 /**
@@ -174,9 +205,11 @@ void loop() {
  * @retval None
  */
 void main() {
+    printf("program started\n");
     short running = true;
     short endSoon = 0;
     setup();
+    printf("success:\tsetup\n");
 
     //while button wasnt pushed
     while(running) {
@@ -186,7 +219,7 @@ void main() {
         }
 
         //interupts the loop
-        if (debug == 2) {
+        if (debug) {
             endSoon++;
             if (endSoon > 100) {
                 break;

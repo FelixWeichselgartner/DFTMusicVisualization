@@ -67,22 +67,6 @@ def plot(filename, signal, fourier, maximum):
     #plt.show()
     plt.clf() 
 
-def highestValue(array):
-    """returns the hightest value of an array
-    
-    Arguments:
-        array {array} -- the array to search the highest value in
-    
-    Returns:
-        integer -- this is the highest value
-    """
-
-    value = 0
-    for x in range(0, 8):
-        if array[x] > value:
-            value = array[x]
-    return value
-
 def normTo8Bit(array):
     """norms an array to a value range of 0 <= value <= 8
     
@@ -91,10 +75,10 @@ def normTo8Bit(array):
     """
 
     norm = 25000
-    if highestValue(array) > 25000:
-            norm = highestValue(array)
-    for x in range(0, 8):
-        array[x] = int(array[x]/norm*8)
+    if max(array) > 25000:
+            norm = max(array)
+    print(norm)
+    return array*8/norm
 
     
 def main():
@@ -167,7 +151,8 @@ def main():
     print('matrix before pushing values to range 0 to 8')
     print(ledMatrix)
 
-    normTo8Bit(ledMatrix)
+    ledMatrix = normTo8Bit(ledMatrix)
+    ledMatrix = ledMatrix.astype(np.int32)
 
     print('this is the led matrix:')
     print('the value is the height and the x-position represents the frequency')

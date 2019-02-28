@@ -13,7 +13,7 @@
 #define true 1
 #define false 0
 
-#define debug true
+#define debug false
 
 #define ARRAYWIDTH 8
 #define samplingFrequency 44100
@@ -21,7 +21,7 @@
 
 static int spi;
 
-const int length = pow(2, 10); //pow(2, n)
+const int length = pow(2, 9); //pow(2, n)
 int channel1 = 0, channel2 = 1;
 int spiChannel = 0, channelConfig = 8;
 short *signal;
@@ -63,7 +63,7 @@ void sample() {
 }
 
 void FormToMatrix() {
-    int max = length/2;
+    int max = length*20000/samplingFrequency;
     int step = max/ARRAYWIDTH;
     int start = 0, end = step;
     for (int i = 0; i < ARRAYWIDTH; i++) {
@@ -109,6 +109,7 @@ void loop() {
 
 void main() {
     short running = true;
+    short endSoon = 0;
     setup();
 
     //while button wasnt pushed
@@ -117,10 +118,17 @@ void main() {
         if (debug) {
             delay(1);
         }
+	endSoon++;
+	if (endSoon > 100) {
+	    break;
+	}
     }
 
     myMatrixEnd();
-    free(signal); free(fourier);
+    printf("Matrix closed\n");
+    free(signal);
+    printf("signal and fourier memory freed\n");
     close(spi);
+    printf("spi closed\n");
     return;
 }

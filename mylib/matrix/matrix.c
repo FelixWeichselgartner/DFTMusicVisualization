@@ -34,13 +34,7 @@ https://github.com/jgarff/rpi_ws281x/blob/master/main.c
 #define STRIP_TYPE              WS2811_STRIP_GBR		// WS2812/SK6812RGB integrated chip+leds
 //#define STRIP_TYPE            SK6812_STRIP_RGBW		// SK6812RGBW (NOT SK6812RGB)
 
-#define WIDTH                   8
-#define HEIGHT                  8
-#define LED_COUNT               (WIDTH * HEIGHT)
-
-int width = WIDTH;
-int height = HEIGHT;
-int led_count = LED_COUNT;
+int width, height, led_count;
 
 static uint8_t running = 1;
 
@@ -151,7 +145,10 @@ static void setup_handlers() {
 
 static ws2811_return_t ret;
 
-void myMatrixSetup() {
+void myMatrixSetup(int w, int h) {
+    width = w;
+    height = h;
+    led_count = width * height;
     matrix = malloc(sizeof(ws2811_led_t) * width * height);
     setup_handlers();
 

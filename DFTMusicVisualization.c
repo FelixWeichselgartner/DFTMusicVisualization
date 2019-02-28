@@ -21,7 +21,7 @@
 //1: ends after endtime (param in main()) seconds
 //2: 1. mode + prints some information in console + 1 second delay in loop
 //3: 1. mode + 2. mode + prints display array to console
-#define debug 1
+#define debug 0
 
 //how much bits the adc got -> the more the better
 #define BITSOFADC 10
@@ -53,6 +53,21 @@ int display[ARRAYWIDTH];
 int norm = pow(2, 10-4); //pow(2, 4) = 8
 //running if 1 - stopping if 0
 int running = true;
+
+//handlers for exiting program by pressing ctrl and c
+static void ctrl_c_handler(int signum) {
+    (void)(signum);
+    running = 0;
+}
+
+static void setup_handlers() {
+    struct sigaction sa = {
+        .sa_handler = ctrl_c_handler,
+    };
+
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+}
 
 /**
  * @brief           integrates a part of the fourier array with rectangular integration
@@ -87,7 +102,7 @@ void setup() {
         printf("wiringPi Setup failed!\n");
         exit(EXIT_FAILURE);
     } else if (debug == true) {
-	printf("success:\twiringPi Setup was a success\n");
+	    printf("success:\twiringPi Setup was a success\n");
     }
 
     //pinMode(gruen, OUTPUT);
@@ -235,13 +250,11 @@ void main() {
 
     //closes matrix, frees signalm memory, closes spi session
     myMatrixEnd();
-    if (debug > 1)
-        printf("Matrix closed\n");
+    
+    printf("Matrix closed\n");
     free(signalm);
-    if (debug > 1)
-        printf("signal and fourier memory freed\n");
+    printf("signal and fourier memory freed\n");
     close(spi);
-    if (debug > 1)
-        printf("spi closed\n");
+    printf("spi closed\n");
     return;
 }

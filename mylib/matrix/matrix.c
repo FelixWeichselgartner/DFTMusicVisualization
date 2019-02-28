@@ -15,6 +15,7 @@ https://github.com/jgarff/rpi_ws281x/blob/master/main.c
 #include <signal.h>
 #include <stdarg.h>
 #include <getopt.h>
+#include <time.h>
 
 #include "../../lib/rpi_ws281x/clk.h"
 #include "../../lib/rpi_ws281x/gpio.h"
@@ -34,11 +35,9 @@ https://github.com/jgarff/rpi_ws281x/blob/master/main.c
 //#define STRIP_TYPE            SK6812_STRIP_RGBW		// SK6812RGBW (NOT SK6812RGB)
 
 //unknown so far - this is changed later
-#define LED_COUNT 64*3
+#define LED_COUNT 0
 
 int width, height, led_count;
-
-static uint8_t running = 1;
 
 ws2811_t ledstring = {
     .freq = TARGET_FREQ,
@@ -102,13 +101,15 @@ ws2811_led_t dotcolors_rgbw[] = {
 };
 
 void OnOff(int i, int v) {
+    srand(time(NULL));
+    int r = rand(8);
     if (v == 0 || v > width || v < 0) {
         for (int k = 0; k < width; k++) {
             matrix[i * width + k] = 0;
         }
     } else {
         for (int k = 0; k < v; k++) {
-            matrix[i * width + k] = dotcolors[0];
+            matrix[i * width + k] = dotcolors[r];
         }
         for (int f = v; f < width; f++) {
             matrix[i * width + f] = 0;
@@ -122,27 +123,13 @@ void writeDisplayMatrix(int *display) {
     }
 }
 
-static void ctrl_c_handler(int signum) {
-    (void)(signum);
-    running = 0;
-}
-
-static void setup_handlers() {
-    struct sigaction sa = {
-        .sa_handler = ctrl_c_handler,
-    };
-
-    sigaction(SIGINT, &sa, NULL);
-    sigaction(SIGTERM, &sa, NULL);
-}
-
 static ws2811_return_t ret;
 
 void myMatrixSetup(int w, int h) {
     width = w;
     height = h;
     led_count = width * height;
-    //ledstring.channel[0].count = led_count;
+    ledstring.channel[0].count = led_count;
     matrix = malloc(sizeof(ws2811_led_t) * led_count);
     setup_handlers();
 
@@ -154,13 +141,6 @@ void myMatrixSetup(int w, int h) {
 
 void myMatrixOutput(int *display) {
     writeDisplayMatrix(display);
-    /*
-    for (int x = 0; x < width; x++) {
-	for (int y = 0; y < height; y++) {
-	    printf("x = %i, y = %i, v = %x\n", x, y, matrix[y * width + x]);
-	}
-    }
-    */
     matrix_render();
 
     if ((ret = ws2811_render(&ledstring)) != WS2811_SUCCESS) {

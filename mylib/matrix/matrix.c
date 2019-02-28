@@ -102,14 +102,19 @@ ws2811_led_t dotcolors_rgbw[] = {
 
 void OnOff(int i, int v) {
     srand(time(NULL));
-    int r = rand(8);
-    if (v == 0 || v > width || v < 0) {
+    int r;
+    if (v == 0 || v < 0) {
         for (int k = 0; k < width; k++) {
             matrix[i * width + k] = 0;
         }
+    } else if (v>8) {
+	for (int k = 0; k < width; k++) {
+	    matrix[i * width + k] = dotcolors[0];
+	}
     } else {
         for (int k = 0; k < v; k++) {
-            matrix[i * width + k] = dotcolors[r];
+	    r = rand()%8;
+            matrix[i * width + k] = dotcolors[0];
         }
         for (int f = v; f < width; f++) {
             matrix[i * width + f] = 0;
@@ -119,6 +124,11 @@ void OnOff(int i, int v) {
 
 void writeDisplayMatrix(int *display) {
     for (int i = 0; i < height; i++) {
+	/*
+	for (int k = 0; k < width; k++) {
+	    matrix[i*width + k] = dotcolors[0];
+	}
+	*/
         OnOff(i, display[i]);
     }
 }
@@ -131,7 +141,6 @@ void myMatrixSetup(int w, int h) {
     led_count = width * height;
     ledstring.channel[0].count = led_count;
     matrix = malloc(sizeof(ws2811_led_t) * led_count);
-    setup_handlers();
 
     if ((ret = ws2811_init(&ledstring)) != WS2811_SUCCESS) {
         fprintf(stderr, "ws2811_init failed: %s\n", ws2811_get_return_t_str(ret));

@@ -18,6 +18,7 @@
 void analogInputTest(int spiChannel, int channelConfig, int channel) {
     time_t start = time(0), startComputation;
     int delaytime = 1/SAMPLE_RATE*1000*1000;
+    int v, computationtime;
 
     FILE *fp;
     fp = fopen("sample.csv", "w");
@@ -27,17 +28,13 @@ void analogInputTest(int spiChannel, int channelConfig, int channel) {
     }
 
     do {
-        for (int k = 0; k < BLOCK_SIZE; k++) {
-            startComputation = time(0);
-
-            buffer[k] = (float)mcpAnalogRead(spiChannel, channelConfig, channel);
-
-            fprintf(fp, "%f\n", buffer[k]);
-
-            computationtime = timediff(time(0), startComputation);
-
-            delayMicroseconds(delaytime-computationtime);
-        }
+        //startComputation = time(0);
+        v = mcpAnalogRead(spiChannel, channelConfig, channel);
+        fprintf(fp, "%i\n", v);
+        //computationtime = difftime(time(0), startComputation);
+	//delayMicroseconds(delaytime-computationtime);
+	delayMicroseconds(delaytime);
+	//printf("%f\n", difftime(time(0), start));
     } while(difftime(time(0), start) < SecondsOfSampling);
 
     fclose(fp);

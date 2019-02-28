@@ -21,7 +21,7 @@
 //1: ends after endtime (param in main()) seconds
 //2: 1. mode + prints some information in console + 1 second delay in loop
 //3: 1. mode + 2. mode + prints display array to console
-#define debug 0
+#define debug 3
 
 //how much bits the adc got -> the more the better
 #define BITSOFADC 10
@@ -40,7 +40,7 @@
 static int spi;
 
 //the length of the signal (and therefore fourier) array;
-const int length = pow(2, 9); //pow(2, n)
+const int length = pow(2, 10); //pow(2, n)
 //the 2 channels of the music signal on the adc pins
 int channel1 = 0, channel2 = 1;
 //spi channel and channel config
@@ -69,6 +69,24 @@ static void setup_handlers() {
     sigaction(SIGTERM, &sa, NULL);
 }
 
+void saveSignal() {
+    FILE *fp;
+    fp = fopen("signal.csv", "w");
+    for (int i = 0; i < length; i++) {
+	fprintf(fp, "%i\n", signalm[i]);
+    }
+    fclose(fp);
+}
+
+void saveFourierTransformation() {
+    FILE *fp;
+    fp = fopen("fourier.csv", "w");
+    for (int i = 0; i < length; i++) {
+	fprintf(fp, "%f\n", fourier[i]);
+    }
+    fclose(fp);
+}
+
 /**
  * @brief           integrates a part of the fourier array with rectangular integration
  * @note   
@@ -81,7 +99,8 @@ int integrate(int start, int end) {
     for (int i = start; i < end; i++) {
         retval = sqrt(creal(fourier[i])*creal(fourier[i]) + cimag(fourier[i])*cimag(fourier[i])) + retval;
     }
-    return (int)retval;
+    printf("retval = %i\n", retval);
+    //return (int)retval;
 }
 
 /**
@@ -108,6 +127,8 @@ void setup() {
     //pinMode(gruen, OUTPUT);
     //digitalWrite(gruen, LOW);
 
+    setup_handlers();
+
     spi = spiSetup(spiChannel);
 
     myMatrixSetup(ARRAYWIDTH, ARRAYHEIGHT);
@@ -127,6 +148,7 @@ void sample() {
         //transform each channel on its own and display left channel on left side of matrix
         //right channel on right side of the matrix
         signalm[i] = (mcpAnalogRead(spiChannel, channelConfig, channel1) + mcpAnalogRead(spiChannel, channelConfig, channel2))/2;
+	//signalm[i] = mcpAnalogRead(spiChannel, channelConfig, 2);
         delayMicroseconds(deltaT);
     }
 }
@@ -139,6 +161,8 @@ void sample() {
 void FormToMatrix() {
     int max = length*20000/samplingFrequency;
     int step = max/ARRAYWIDTH;
+    if (debug > 1)
+	printf("step = %i", step);
     int start = 0, end = step;
     for (int i = 0; i < ARRAYWIDTH; i++) {
         display[i] = integrate(start, end);
@@ -147,14 +171,44 @@ void FormToMatrix() {
     }
 }
 
+int minValue() {
+    int retval = 0;
+    for(int i = 1; i < ARRAYWIDTH; i++) {
+	if (display[i] < retval) {
+	    retval = display[i];
+	}
+    }
+    return retval;
+}
+
+int maxValue() {
+    int retval = 0;
+    for(int i = 1; i < ARRAYWIDTH; i++) {
+	if (display[i] > retval) {
+	    retval = display[i];
+	}
+    }
+    return retval;
+}
+
 /**
  * @brief  norms the display array to ARRAYHEIGHT
  * @note   
  * @retval None
  */
 void normTo8Bit() {
+    int minVal = minValue();
     for (int i = 0; i < ARRAYWIDTH; i++) {
-        display[i] = display[i]*ARRAYHEIGHT/pow(2, BITSOFADC);
+        display[i] = display[i] - minVal;
+	printf("%i: %i, ", i, display[i]);
+    }
+    printf("\n");
+
+    int maxVal = maxValue();
+    printf("maxVal = %i", maxVal);
+    int devider = maxVal/8;
+    for (int i = 0; i < ARRAYWIDTH; i++) {
+        display[i] = display[i]/devider;
     }
 }
 
@@ -165,11 +219,11 @@ void normTo8Bit() {
  */
 void ConsoleOutput() {
     printf("Matrix:\n");
-    for(int i = 0; i < ARRAYHEIGHT; i++) {
+    for(int i = 0; i < ARRAYWIDTH; i++) {
         printf("%2i ", i);
     }
     printf("\n");
-    for(int i = 0; i < ARRAYHEIGHT; i++) {
+    for(int i = 0; i < ARRAYWIDTH; i++) {
         printf("%2i ", display[i]);
     }
     printf("\n");
@@ -215,6 +269,10 @@ void loop() {
     if (debug > 1) {
 	    printf("success:\tmatrix output\n");
     }
+
+    saveSignal();
+    saveFourierTransformation();
+
     free(fourier);
     if (debug > 1) {
 	    printf("success:\tfreed fourier memory\n");
@@ -227,8 +285,6 @@ void loop() {
  * @retval None
  */
 void main() {
-    time_t start = time(0);
-    short endtime = 15;
     printf("program started\n");
     setup();
     printf("success:\tsetup\n");
@@ -239,13 +295,7 @@ void main() {
         loop();
 
         if (debug > 1)
-            delay(1);
-
-        if (debug > 0) {
-            //interupts the loop after endtime
-            if (difftime(time(0), start) > endtime)
-                break;
-        }
+	    delay(1000);
     }
 
     //closes matrix, frees signalm memory, closes spi session

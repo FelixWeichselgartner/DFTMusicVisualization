@@ -51,7 +51,7 @@ program execution stops and cleans up after itself.
 #define DMA                     10
 #define STRIP_TYPE              WS2811_STRIP_GBR		// WS2812/SK6812RGB integrated chip+leds
 
-#define WIDTH                   8
+#define WIDTH                   8 * 3
 #define HEIGHT                  8
 #define LED_COUNT               (WIDTH * HEIGHT)
 
@@ -60,6 +60,7 @@ int running = 1;
 int width = WIDTH;
 int height = HEIGHT;
 int led_count = LED_COUNT;
+int currentled;
 
 int clear_on_exit = 0;
 
@@ -102,11 +103,15 @@ ws2811_led_t dotcolors[] =
 };
 
 void matrix_set() {
-    for (int y = 0; y < (height - 1); y++) {
-        for (int x = 0; x < width; x++) {
-            matrix[y * width + x] = dotcolors[x];
-        }
+    if (currentled - 1 < 0) {
+        matrix[led_count-1] = 0;
+    } else {
+        matrix[currentled-1] = 0;
     }
+    if (currentled >= led_count) {
+        currentled = 0;
+    }
+    matrix[currentled] = dotcolors[7];
 }
 
 void matrix_render() {
@@ -140,33 +145,33 @@ static void setup_handlers() {
 }
 
 int main() {
+    currentled = 0;
     printf("you are running the matrix_test\n");
     short running = true;
     int sleeptime = 1000000 / 15;
 
     matrix = malloc(sizeof(ws2811_led_t) * width * height);
     if (matrix == NULL) {
-	printf("failed to get heap memory\n");
+	    printf("failed to get heap memory\n");
     } else {
-	printf("heap memory was reserved\n");
+	    printf("heap memory was reserved\n");
     }
 
     setup_handlers();
 
     ws2811_return_t ret;
     ret = ws2811_init(&ledstring);
-    printf("we got so far - hold on!\n");
     if (ret != WS2811_SUCCESS) {
         printf("failed to initialize\n");
         return 1;
     } else {
-	printf("initialized the led string");
+	    printf("initialized the led string");
     }
 
-    matrix_set();
-
     while (running) {
-	printf("run ");
+	    matrix_set();
+        matrix_render();
+
         if ((ret = ws2811_render(&ledstring)) != WS2811_SUCCESS) {
             printf("failed to render\n");
             break;

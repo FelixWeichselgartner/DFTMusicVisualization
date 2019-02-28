@@ -107,7 +107,7 @@ void OnOff(int i, int v) {
         for (int k = 0; k < width; k++) {
             matrix[i * width + k] = 0;
         }
-    } else if (v>8) {
+    } else if (v > 8) {
 	for (int k = 0; k < width; k++) {
 	    matrix[i * width + k] = dotcolors[0];
 	}
@@ -124,11 +124,6 @@ void OnOff(int i, int v) {
 
 void writeDisplayMatrix(int *display) {
     for (int i = 0; i < height; i++) {
-	/*
-	for (int k = 0; k < width; k++) {
-	    matrix[i*width + k] = dotcolors[0];
-	}
-	*/
         OnOff(i, display[i]);
     }
 }

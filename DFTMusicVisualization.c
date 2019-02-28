@@ -27,7 +27,7 @@
 #define BITSOFADC 10
 
 //the width and height of your matrix setup
-#define ARRAYWIDTH 8*3
+#define ARRAYWIDTH 8
 #define ARRAYHEIGHT 8
 
 //the sampling frequency with which the adc works
@@ -40,7 +40,7 @@
 static int spi;
 
 //the length of the signal (and therefore fourier) array;
-const int length = pow(2, 10); //pow(2, n)
+const int length = pow(2, 9); //pow(2, n)
 //the 2 channels of the music signal on the adc pins
 int channel1 = 0, channel2 = 1;
 //spi channel and channel config
@@ -99,8 +99,8 @@ int integrate(int start, int end) {
     for (int i = start; i < end; i++) {
         retval = sqrt(creal(fourier[i])*creal(fourier[i]) + cimag(fourier[i])*cimag(fourier[i])) + retval;
     }
-    printf("retval = %i\n", retval);
-    //return (int)retval;
+    //printf("retval = %i\n", retval);
+    return (int)retval;
 }
 
 /**
@@ -113,14 +113,14 @@ void setup() {
 
     signalm = malloc(length * sizeof(short));
 
-    if (debug == true) {
-	printf("success:\tallocated signalm memory\n");
+    if (debug > 1) {
+	    printf("success:\tallocated signalm memory\n");
     }
 
     if (wiringPiSetup() == -1) {
         printf("wiringPi Setup failed!\n");
         exit(EXIT_FAILURE);
-    } else if (debug == true) {
+    } else if (debug > 1) {
 	    printf("success:\twiringPi Setup was a success\n");
     }
 
@@ -132,8 +132,8 @@ void setup() {
     spi = spiSetup(spiChannel);
 
     myMatrixSetup(ARRAYWIDTH, ARRAYHEIGHT);
-    if (debug == true) {
-	printf("success:\tmy matrix setup\n");
+    if (debug > 1) {
+	    printf("success:\tmy matrix setup\n");
     }
 }
 
@@ -148,7 +148,6 @@ void sample() {
         //transform each channel on its own and display left channel on left side of matrix
         //right channel on right side of the matrix
         signalm[i] = (mcpAnalogRead(spiChannel, channelConfig, channel1) + mcpAnalogRead(spiChannel, channelConfig, channel2))/2;
-	//signalm[i] = mcpAnalogRead(spiChannel, channelConfig, 2);
         delayMicroseconds(deltaT);
     }
 }
@@ -162,7 +161,7 @@ void FormToMatrix() {
     int max = length*20000/samplingFrequency;
     int step = max/ARRAYWIDTH;
     if (debug > 1)
-	printf("step = %i", step);
+	    printf("step = %i", step);
     int start = 0, end = step;
     for (int i = 0; i < ARRAYWIDTH; i++) {
         display[i] = integrate(start, end);
@@ -197,6 +196,7 @@ int maxValue() {
  * @retval None
  */
 void normTo8Bit() {
+    /*
     int minVal = minValue();
     for (int i = 0; i < ARRAYWIDTH; i++) {
         display[i] = display[i] - minVal;
@@ -206,9 +206,11 @@ void normTo8Bit() {
 
     int maxVal = maxValue();
     printf("maxVal = %i", maxVal);
-    int devider = maxVal/8;
+    int divider = maxVal/8;
+    */
     for (int i = 0; i < ARRAYWIDTH; i++) {
-        display[i] = display[i]/devider;
+        //display[i] = display[i]/divider;
+        display[i] = diplay[i]*8/pow(2, 10);
     }
 }
 

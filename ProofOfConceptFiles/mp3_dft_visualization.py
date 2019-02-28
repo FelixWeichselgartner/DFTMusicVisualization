@@ -76,7 +76,7 @@ def normTo8Bit(array):
 
     norm = 25000
     if max(array) > 25000:
-            norm = max(array)
+        norm = max(array)
     print(norm)
     return array*8/norm
 

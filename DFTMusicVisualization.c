@@ -5,6 +5,7 @@
 #include <time.h>
 #include <math.h>
 #include <complex.h>
+#include <signal.h>
 //wiringPi
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
@@ -26,8 +27,8 @@
 #define BITSOFADC 10
 
 //the width and height of your matrix setup
-#define ARRAYWIDTH 8
-#define ARRAYHEIGHT 24
+#define ARRAYWIDTH 8*3
+#define ARRAYHEIGHT 8
 
 //the sampling frequency with which the adc works
 #define samplingFrequency 44100
@@ -45,11 +46,13 @@ int channel1 = 0, channel2 = 1;
 //spi channel and channel config
 int spiChannel = 0, channelConfig = 8;
 //pointer for signal and dft to allocate memory
-short *signal;
+short *signalm;
 float complex *fourier;
 //contains the calculated information to display on the matrix
-int display[ARRAYHEIGHT];
+int display[ARRAYWIDTH];
 int norm = pow(2, 10-4); //pow(2, 4) = 8
+//running if 1 - stopping if 0
+int running = true;
 
 /**
  * @brief           integrates a part of the fourier array with rectangular integration
@@ -67,17 +70,17 @@ int integrate(int start, int end) {
 }
 
 /**
- * @brief  sets up the signal memory, initialises wiringpi, setup for matrix and spi for adc
+ * @brief  sets up the signalm memory, initialises wiringpi, setup for matrix and spi for adc
  * @note   
  * @retval None
  */
 void setup() {
-    printf("starting:\tallocating signal memory\n");
+    printf("starting:\tallocating signalm memory\n");
 
-    signal = malloc(length * sizeof(short));
+    signalm = malloc(length * sizeof(short));
 
     if (debug == true) {
-	printf("success:\tallocated signal memory\n");
+	printf("success:\tallocated signalm memory\n");
     }
 
     if (wiringPiSetup() == -1) {
@@ -92,7 +95,7 @@ void setup() {
 
     spi = spiSetup(spiChannel);
 
-    myMatrixSetup(ARRAYHEIGHT, ARRAYWIDTH);
+    myMatrixSetup(ARRAYWIDTH, ARRAYHEIGHT);
     if (debug == true) {
 	printf("success:\tmy matrix setup\n");
     }
@@ -100,7 +103,7 @@ void setup() {
 
 /**
  * @brief  the sampling loop
- * @note   fills the signal array ((earlier allocated) with analog values from the adc
+ * @note   fills the signalm array ((earlier allocated) with analog values from the adc
  * @retval None
  */
 void sample() {
@@ -108,7 +111,7 @@ void sample() {
         //later:
         //transform each channel on its own and display left channel on left side of matrix
         //right channel on right side of the matrix
-        signal[i] = (mcpAnalogRead(spiChannel, channelConfig, channel1) + mcpAnalogRead(spiChannel, channelConfig, channel2))/2;
+        signalm[i] = (mcpAnalogRead(spiChannel, channelConfig, channel1) + mcpAnalogRead(spiChannel, channelConfig, channel2))/2;
         delayMicroseconds(deltaT);
     }
 }
@@ -120,9 +123,9 @@ void sample() {
  */
 void FormToMatrix() {
     int max = length*20000/samplingFrequency;
-    int step = max/ARRAYHEIGHT;
+    int step = max/ARRAYWIDTH;
     int start = 0, end = step;
-    for (int i = 0; i < ARRAYHEIGHT; i++) {
+    for (int i = 0; i < ARRAYWIDTH; i++) {
         display[i] = integrate(start, end);
         start += step;
         end += step;
@@ -135,8 +138,8 @@ void FormToMatrix() {
  * @retval None
  */
 void normTo8Bit() {
-    for (int i = 0; i < ARRAYHEIGHT; i++) {
-        display[i] = display[i]*ARRAYWIDTH/pow(2, BITSOFADC);
+    for (int i = 0; i < ARRAYWIDTH; i++) {
+        display[i] = display[i]*ARRAYHEIGHT/pow(2, BITSOFADC);
     }
 }
 
@@ -163,7 +166,8 @@ void ConsoleOutput() {
  * @retval None
  */
 void MatrixOutput() {
-    printf("program going to matrix.c file now\n");
+    if (debug > 1)
+        printf("program going to matrix.c file now\n");
     myMatrixOutput(display);
 }
 
@@ -177,7 +181,7 @@ void loop() {
     if (debug > 1) {
 	    printf("success:\tsample\n");
     }
-    fourier = fft(signal, length);
+    fourier = fft(signalm, length);
     if (debug > 1) {
 	    printf("success:\tfourier\n");
     }
@@ -209,12 +213,12 @@ void loop() {
  */
 void main() {
     time_t start = time(0);
-    short endtime = 30;
+    short endtime = 15;
     printf("program started\n");
-    short running = true;
     setup();
     printf("success:\tsetup\n");
 
+    printf("starting:\tentering loop now\n");
     //while button wasnt pushed
     while(running) {
         loop();
@@ -229,11 +233,11 @@ void main() {
         }
     }
 
-    //closes matrix, frees signal memory, closes spi session
+    //closes matrix, frees signalm memory, closes spi session
     myMatrixEnd();
     if (debug > 1)
         printf("Matrix closed\n");
-    free(signal);
+    free(signalm);
     if (debug > 1)
         printf("signal and fourier memory freed\n");
     close(spi);

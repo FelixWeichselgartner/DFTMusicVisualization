@@ -34,7 +34,7 @@ https://github.com/jgarff/rpi_ws281x/blob/master/main.c
 //#define STRIP_TYPE            SK6812_STRIP_RGBW		// SK6812RGBW (NOT SK6812RGB)
 
 //unknown so far - this is changed later
-#define LED_COUNT 0
+#define LED_COUNT 64*3
 
 int width, height, led_count;
 
@@ -117,7 +117,7 @@ void OnOff(int i, int v) {
 }
 
 void writeDisplayMatrix(int *display) {
-    for (int i = 0; i < width; i++) {
+    for (int i = 0; i < height; i++) {
         OnOff(i, display[i]);
     }
 }
@@ -142,7 +142,7 @@ void myMatrixSetup(int w, int h) {
     width = w;
     height = h;
     led_count = width * height;
-    ledstring.channel[0].count = led_count;
+    //ledstring.channel[0].count = led_count;
     matrix = malloc(sizeof(ws2811_led_t) * led_count);
     setup_handlers();
 
@@ -154,13 +154,20 @@ void myMatrixSetup(int w, int h) {
 
 void myMatrixOutput(int *display) {
     writeDisplayMatrix(display);
+    /*
+    for (int x = 0; x < width; x++) {
+	for (int y = 0; y < height; y++) {
+	    printf("x = %i, y = %i, v = %x\n", x, y, matrix[y * width + x]);
+	}
+    }
+    */
     matrix_render();
 
     if ((ret = ws2811_render(&ledstring)) != WS2811_SUCCESS) {
         fprintf(stderr, "ws2811_render failed: %s\n", ws2811_get_return_t_str(ret));
         return;
     }
-
+    
     return;
 }
 

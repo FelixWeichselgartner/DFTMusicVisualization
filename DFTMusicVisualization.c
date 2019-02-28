@@ -16,8 +16,11 @@
 #define true 1
 #define false 0
 
-//debug mode
-#define debug true
+//debug modes:
+//1: ends after endtime (param in main()) seconds
+//2: 1. mode + prints some information in console + 1 second delay in loop
+//3: 1. mode + 2. mode + prints display array to console
+#define debug 1
 
 //how much bits the adc got -> the more the better
 #define BITSOFADC 10
@@ -89,7 +92,7 @@ void setup() {
 
     spi = spiSetup(spiChannel);
 
-    myMatrixSetup(ARRAYWIDTH, ARRAYHEIGHT);
+    myMatrixSetup(ARRAYHEIGHT, ARRAYWIDTH);
     if (debug == true) {
 	printf("success:\tmy matrix setup\n");
     }
@@ -171,31 +174,31 @@ void MatrixOutput() {
  */
 void loop() {
     sample();
-    if (debug == true) {
-	printf("success:\tsample\n");
+    if (debug > 1) {
+	    printf("success:\tsample\n");
     }
     fourier = fft(signal, length);
-    if (debug == true) {
-	printf("success:\tfourier\n");
+    if (debug > 1) {
+	    printf("success:\tfourier\n");
     }
     FormToMatrix();
-    if (debug == true) {
-	printf("success:\tform to matrix\n");
+    if (debug > 1) {
+	    printf("success:\tform to matrix\n");
     }
     normTo8Bit();
-    if (debug == true) {
-	printf("success:\tnorm to 8 bit\n");
+    if (debug > 1) {
+	    printf("success:\tnorm to 8 bit\n");
     }
-    if (debug == true) {
-	    //ConsoleOutput();
+    if (debug > 2) {
+	    ConsoleOutput();
     }
     MatrixOutput();
-    if (debug == true) {
-	printf("success:\tmatrix output\n");
+    if (debug > 1) {
+	    printf("success:\tmatrix output\n");
     }
     free(fourier);
-    if (debug == true) {
-	printf("success:\tfreed fourier memory\n");
+    if (debug > 1) {
+	    printf("success:\tfreed fourier memory\n");
     }
 }
 
@@ -205,34 +208,36 @@ void loop() {
  * @retval None
  */
 void main() {
+    time_t start = time(0);
+    short endtime = 30;
     printf("program started\n");
     short running = true;
-    short endSoon = 0;
     setup();
     printf("success:\tsetup\n");
 
     //while button wasnt pushed
     while(running) {
         loop();
-        if (debug) {
-            delay(1);
-        }
 
-        //interupts the loop
-        if (debug) {
-            endSoon++;
-            if (endSoon > 100) {
+        if (debug > 1)
+            delay(1);
+
+        if (debug > 0) {
+            //interupts the loop after endtime
+            if (difftime(time(0), start) > endtime)
                 break;
-            }
         }
     }
 
     //closes matrix, frees signal memory, closes spi session
     myMatrixEnd();
-    printf("Matrix closed\n");
+    if (debug > 1)
+        printf("Matrix closed\n");
     free(signal);
-    printf("signal and fourier memory freed\n");
+    if (debug > 1)
+        printf("signal and fourier memory freed\n");
     close(spi);
-    printf("spi closed\n");
+    if (debug > 1)
+        printf("spi closed\n");
     return;
 }

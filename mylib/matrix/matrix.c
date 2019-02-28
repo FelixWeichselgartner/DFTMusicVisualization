@@ -33,7 +33,7 @@ https://github.com/jgarff/rpi_ws281x/blob/master/main.c
 #define STRIP_TYPE              WS2811_STRIP_GBR		// WS2812/SK6812RGB integrated chip+leds
 //#define STRIP_TYPE            SK6812_STRIP_RGBW		// SK6812RGBW (NOT SK6812RGB)
 
-//unknown so far
+//unknown so far - this is changed later
 #define LED_COUNT 0
 
 int width, height, led_count;

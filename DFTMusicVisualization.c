@@ -21,13 +21,13 @@
 //1: ends after endtime (param in main()) seconds
 //2: 1. mode + prints some information in console + 1 second delay in loop
 //3: 1. mode + 2. mode + prints display array to console
-#define debug 3
+#define debug 0
 
 //how much bits the adc got -> the more the better
 #define BITSOFADC 10
 
 //the width and height of your matrix setup
-#define ARRAYWIDTH 8
+#define ARRAYWIDTH 8 * 3
 #define ARRAYHEIGHT 8
 
 //the sampling frequency with which the adc works
@@ -210,7 +210,7 @@ void normTo8Bit() {
     */
     for (int i = 0; i < ARRAYWIDTH; i++) {
         //display[i] = display[i]/divider;
-        display[i] = diplay[i]*8/pow(2, 10);
+        display[i] = display[i]*8/pow(2, 10);
     }
 }
 
@@ -297,7 +297,7 @@ void main() {
         loop();
 
         if (debug > 1)
-	    delay(1000);
+	    delay(5000);
     }
 
     //closes matrix, frees signalm memory, closes spi session

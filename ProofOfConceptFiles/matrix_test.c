@@ -32,6 +32,7 @@ program execution stops and cleans up after itself.
 #include <signal.h>
 #include <stdarg.h>
 #include <getopt.h>
+#include <wiringPi.h>
 
 #include "../lib/rpi_ws281x/clk.h"
 #include "../lib/rpi_ws281x/gpio.h"
@@ -104,14 +105,15 @@ ws2811_led_t dotcolors[] =
 
 void matrix_set() {
     if (currentled - 1 < 0) {
-        matrix[led_count-1] = 0;
+        matrix[led_count - 1] = 0;
     } else {
-        matrix[currentled-1] = 0;
+        matrix[currentled - 1] = 0;
     }
     if (currentled >= led_count) {
         currentled = 0;
     }
     matrix[currentled] = dotcolors[7];
+    currentled++;
 }
 
 void matrix_render() {
@@ -168,22 +170,30 @@ int main() {
 	    printf("initialized the led string");
     }
 
+    int count = 0;
+
     while (running) {
-	    matrix_set();
+	printf("loop\n");
+	count++;
+	if (count == 2*3*8*8 + 10)
+	    break;
+	matrix_set();
         matrix_render();
 
         if ((ret = ws2811_render(&ledstring)) != WS2811_SUCCESS) {
             printf("failed to render\n");
             break;
         }
-
-        usleep(sleeptime);
+	
+	delay(50);
+        //usleep(sleeptime);
     }
 
     if (clear_on_exit) {
 
     }
-
+    matrix_clear();
+    matrix_render();
     ws2811_fini(&ledstring);
     printf("program closed\n");
 

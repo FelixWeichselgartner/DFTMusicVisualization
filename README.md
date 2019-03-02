@@ -1,4 +1,4 @@
-DFTMusicVisualization
+## DFTMusicVisualization
 =====================
 
 music visualization on a rgb led matrix with fourier transformation
@@ -28,3 +28,11 @@ execute the program with:
 sudo ./DFTMusicVisualization
 ```
 
+
+## What I Learned
+
+* implementation of fourier transformation
+* controlling led matrices with raspberrypi/arduino
+* using CMake
+* function principle behind audio files
+* sampling audio files

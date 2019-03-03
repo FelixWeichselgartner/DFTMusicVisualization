@@ -61,6 +61,11 @@ ws2811_t ledstring = {
 
 ws2811_led_t *matrix;
 
+/**
+ * @brief           copies the array for the matrix to the matrix
+ * @note   
+ * @retval None
+ */
 void matrix_render() {
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
@@ -69,6 +74,11 @@ void matrix_render() {
     }
 }
 
+/**
+ * @brief           sets all values of the array for the matrix to 0 (off)
+ * @note   
+ * @retval None
+ */
 void matrix_clear() {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
@@ -100,6 +110,12 @@ ws2811_led_t dotcolors_rgbw[] = {
 
 };
 
+/**
+ * @brief               converts the display array into the corresponding matrix array
+ * @note   
+ * @param  *display:    pointer to the display array -> contains the height for each column of the matrix
+ * @retval None
+ */
 void writeDisplayMatrix(int *display) {
     short MATRIX_DEBUG = 0;
     matrix_clear();
@@ -133,6 +149,13 @@ void writeDisplayMatrix(int *display) {
 
 static ws2811_return_t ret;
 
+/**
+ * @brief           sets up the matrix communication
+ * @note            initialises the width, height and a ledstring (the matrices) and reserves memory for 
+ * @param  w:       width of the matrix
+ * @param  h:       height of the matrix
+ * @retval None
+ */
 void myMatrixSetup(int w, int h) {
     width = w;
     height = h;
@@ -146,6 +169,12 @@ void myMatrixSetup(int w, int h) {
     }
 }
 
+/**
+ * @brief               writes the display array to a array for the matrix
+ * @note   
+ * @param  *display:    pointer to the display array -> contains the height for each column of the matrix
+ * @retval None
+ */
 void myMatrixOutput(int *display) {
     writeDisplayMatrix(display);
     matrix_render();
@@ -158,6 +187,11 @@ void myMatrixOutput(int *display) {
     return;
 }
 
+/**
+ * @brief               clears the matrix, frees memory, ends communication
+ * @note   
+ * @retval None
+ */
 void myMatrixEnd() {
     matrix_clear();
     matrix_render();

@@ -14,6 +14,14 @@
 //compile command for main function:
 //gcc analogInputTest.c ../mylib/mcp3008/mcp3008.c -lwiringPi -o analogInputTest
 
+/**
+ * @brief                   samples analog values to a csv file
+ * @note              
+ * @param  spiChannel:      the current spi channel
+ * @param  channelConfig:   the current channel config
+ * @param  channel:         the current analog channel
+ * @retval None
+ */
 void analogInputTest(int spiChannel, int channelConfig, int channel) {
     int delaytime = 1/SAMPLE_RATE*1000*1000;
     int v;
@@ -35,6 +43,11 @@ void analogInputTest(int spiChannel, int channelConfig, int channel) {
     return;
 }
 
+/**
+ * @brief  setup
+ * @note   
+ * @retval 
+ */
 int main() {
     static int spi;
     int channel = 0, spiChannel = 0, channelConfig = 8;

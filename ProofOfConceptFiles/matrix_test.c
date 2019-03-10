@@ -146,6 +146,11 @@ static void setup_handlers() {
     sigaction(SIGTERM, &sa, NULL);
 }
 
+/**
+ * @brief  test for the matrix
+ * @note   lets each led light up individually -> so you can see the arangement of the leds
+ * @retval 
+ */
 int main() {
     currentled = 0;
     printf("you are running the matrix_test\n");
@@ -172,26 +177,22 @@ int main() {
 
     int count = 0;
 
-    while (running) {
-	printf("loop\n");
-	count++;
-	if (count == 2*3*8*8 + 10)
-	    break;
-	matrix_set();
+    while (running) { 
+        printf("loop\n");
+        count++;
+        if (count == 2 * width * height + height)
+            break;
+        matrix_set();
         matrix_render();
 
         if ((ret = ws2811_render(&ledstring)) != WS2811_SUCCESS) {
             printf("failed to render\n");
             break;
         }
-	
-	delay(50);
-        //usleep(sleeptime);
+        
+        delay(50);
     }
 
-    if (clear_on_exit) {
-
-    }
     matrix_clear();
     matrix_render();
     ws2811_fini(&ledstring);

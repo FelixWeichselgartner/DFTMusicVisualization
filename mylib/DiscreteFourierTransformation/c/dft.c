@@ -5,10 +5,24 @@
 
 #define pi 3.14159265358979323846
 
+/**
+ * @brief       absolute value of a complex number (c * conj(c) = sqrt(real(c)^2 + imag(c)^2))
+ * @note   
+ * @param  x:   the real component
+ * @param  y:   the imaginary component
+ * @retval      the absolute value
+ */
 float absoluteComplex(float x, float y) {
     return sqrt(x * x + y * y);
 }
 
+/**
+ * @brief               prints a double array to the console
+ * @note   
+ * @param  *x:          pointer to double array
+ * @param  length:      length of the double array
+ * @retval None
+ */
 void ConsoleDArray(float *x, int length) {
     printf("float array: ");
     for (int i = 0; i < length; i++)
@@ -18,6 +32,13 @@ void ConsoleDArray(float *x, int length) {
     printf("\n\n");
 }
 
+/**
+ * @brief               prints a complex array to the console
+ * @note   
+ * @param  *x:          pointer to complex array
+ * @param  length:      length of the complex array
+ * @retval None
+ */
 void ConsoleCArray(float complex *x, int length) {
     printf("float absolute: \n");
     for (int i = 0; i < length; i++)
@@ -28,6 +49,13 @@ void ConsoleCArray(float complex *x, int length) {
     printf("\n\n");
 }
 
+/**
+ * @brief       implementation of the arctan2
+ * @note        
+ * @param  x:   the x component (or real)
+ * @param  y:   the y component (or imag)
+ * @retval      the angle in radian
+ */
 float arctan2(float x, float y) {
     //values = ]-pi;pi]
     if (x>0) {
@@ -51,10 +79,23 @@ float arctan2(float x, float y) {
     }
 }
 
+/**
+ * @brief       calculates the angle of a complex number
+ * @note   
+ * @param  X:   a complex number to calculate the angle for
+ * @retval      the angle in radian
+ */
 float angle(float complex X){
     return arctan2(creal(X), cimag(X));
 }
 
+/**
+ * @brief       implementation of discrete fourier transformation
+ * @note   
+ * @param  *x:  the function to be transformed
+ * @param  N:   the amount of values in the function
+ * @retval      pointer to the fourier transformation
+ */
 float complex * dft(short *x, int N) {
     float complex *X;
     X = malloc(N * sizeof(float complex));
@@ -71,6 +112,13 @@ float complex * dft(short *x, int N) {
     return X;
 }
 
+/**
+ * @brief       implementation of fast fourier transformation
+ * @note   
+ * @param  *x:  the function to be transformed
+ * @param  N:   the amount of values in the function
+ * @retval      pointer to the fourier transformation
+ */
 float complex * fft(short *x, int N) {
     int max = N/2;
 
@@ -104,6 +152,14 @@ float complex * fft(short *x, int N) {
     return X;
 }
 
+/**
+ * @brief               adds zeros to the function to get a better resolution
+ * @note   
+ * @param  *function:   the function to add the zeros to
+ * @param  N:           the current length of the function
+ * @param  n:           the new length of the function
+ * @retval None
+ */
 void zeroPadding(float *function, int N, int n) {
     function = (float *)realloc(function, n * sizeof(float));
     for (int x = n - N; x < n; x++) {
@@ -111,6 +167,13 @@ void zeroPadding(float *function, int N, int n) {
     }
 }
 
+/**
+ * @brief               adds zeros so the length of the function is pow(2, n) with n being a positive integer
+ * @note   
+ * @param  *function:   the function to add zeros to
+ * @param  N:           the current length
+ * @retval None
+ */
 void zeroPaddingToNextPOW2N(float *function, int N) {
     int n = 1;
     while (N > pow(2, n)) {
@@ -120,6 +183,14 @@ void zeroPaddingToNextPOW2N(float *function, int N) {
     zeroPadding(function, add, N);
 }
 
+/**
+ * @brief           implementation of the vonHann window
+ * @note   
+ * @param  alpha:   the alpha value
+ * @param  beta:    the beta value
+ * @param  N:       the length of the window function
+ * @retval          pointer to the generated window function
+ */
 float * vonHann(float alpha, float beta, int N) {
     float *vonHann = malloc(N * sizeof(float));
     for (int n = 0; n < N; n++) {
@@ -128,6 +199,12 @@ float * vonHann(float alpha, float beta, int N) {
     return vonHann;
 }
 
+/**
+ * @brief       implementation of the hamming window
+ * @note   
+ * @param  N:   the lenght of the windows function
+ * @retval      pointer to the generated window function
+ */
 float * hamming(int N) {
     float alpha = 25.0/46;
     float beta = 1 - alpha;

@@ -1,0 +1,14 @@
+https://snowboy.kitt.ai/docs
+if errors do snowboy stuff
+
+sudo apt-get install libportaudio0
+sudo apt-get install libportaudio2
+sudo apt-get install libportaudiocpp0
+sudo apt-get install portaudio19-dev
+
+sudo apt-get install python-pyaudio python3-pyaudio sox
+
+python3 -m pip install pyaudio
+
+test with:
+rec test.wav

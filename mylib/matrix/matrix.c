@@ -118,7 +118,7 @@ void writeDisplayMatrix(int *display) {
 		if (MATRIX_DEBUG)
 		    printf("\t\ti = %2i, i * 8 + k = %2i\t%i", i, i * widthOneMatrix + k, display[b]);
 		if (display[b] > i) {
-		    matrix[i * widthOneMatrix + k] = dotcolors[0];
+		    matrix[i * widthOneMatrix + k] = dotcolors_rgbw[4];
 		    if (MATRIX_DEBUG)
 			printf("\ton\n");
 		} else {

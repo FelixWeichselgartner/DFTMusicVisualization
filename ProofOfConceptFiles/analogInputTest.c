@@ -1,15 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "../mylib/mcp3008/mcp3008.h"
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 
 #define NUM_CHANNELS 1
-#define SAMPLE_RATE 48000
-#define SecondsOfSampling 10
-#define BLOCK_SIZE 480000 //512
+#define SAMPLE_RATE 2*48000
+#define SecondsOfSampling 20
+#define BLOCK_SIZE 2*480000 //512
 
 //compile command for main function:
 //gcc analogInputTest.c ../mylib/mcp3008/mcp3008.c -lwiringPi -o analogInputTest
@@ -17,6 +18,7 @@
 void analogInputTest(int spiChannel, int channelConfig, int channel) {
     int delaytime = 1/SAMPLE_RATE*1000*1000;
     int v;
+    time_t start = time(0);
 
     FILE *fp;
     fp = fopen("sample.csv", "w");

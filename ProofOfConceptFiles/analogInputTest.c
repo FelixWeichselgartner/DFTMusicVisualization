@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <time.h>
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <unistd.h> 
+#include <time.h> 
 #include <string.h>
 
 #include "../mylib/mcp3008/mcp3008.h"
@@ -55,30 +55,41 @@ void analogInputTest(int spiChannel, int channelConfig, int channel) {
 int main(int argc, char* argv[]) {
     if (argc > 1) {
         if (!strcmp(argv[1], "-usb")) {
-            deviceNumber = 1;
-            amountChannels = 1;
-            bufferFrames = 128;
-            samplingRate = SAMPLE_RATE;
-            short *sample;
-            int sampleLength;
-            init(int deviceNumber, int amountChannels, int bufferFrames, int samplingRate);
+	    int delaytime = 1 / SAMPLE_RATE * 1000 * 1000;
+    	    time_t start = time(0);
+
+            int deviceNumber = 1, amountChannels = 1, bufferFrames = 128, samplingRate = SAMPLE_RATE, sampleLength;
+            short *sample = NULL;
+
+            initAlsa(deviceNumber, amountChannels, bufferFrames, samplingRate);
+
             FILE *fp;
-            fp = fopen("sample.csv", "w");
+            fp = fopen("sampleAlsa.csv", "w");
+
             if (fp == NULL) {
                 printf("[Error] Couldn't create csv-file");
                 exit(1);
             }
 
-            do {
-                read(sample, &sampleLength);
-                for (int i = 0; i < length; i++) {
+            //do {
+                sampleLength = readAlsa(&sample);
+
+		if (sample == NULL) {
+		    printf("[SampleError] error occured memory related while sampling");
+		    exit(1);
+		}
+
+                for (int i = 0; i < sampleLength; i++) {
                     fprintf(fp, "%i;\n", sample[i]);
-                    free(sample);
                 }
-            } while (difftime(time(0), start) < SecondsOfSampling);
-            
+
+		free(sample);
+		sample = NULL;
+
+            //} while (difftime(time(0), start) < SecondsOfSampling);
+
             fclose(fp);
-            close();
+            closeAlsa();
             exit(1);
         }
     } else {

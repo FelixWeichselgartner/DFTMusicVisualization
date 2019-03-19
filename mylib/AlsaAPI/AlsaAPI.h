@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <alsa/asoundlib.h>
 
-int init(int, int, int, int);
-void read(unsigned short *, int);
-void close();
+int initAlsa(int, int, int, int);
+int readAlsa(short **);
+void closeAlsa();
 
 #endif

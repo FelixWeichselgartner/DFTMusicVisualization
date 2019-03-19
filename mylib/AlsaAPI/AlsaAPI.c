@@ -10,16 +10,18 @@ int i;
 int err;
 int buffer_frames; //128
 unsigned int rate; //44100
+int amountChannels;
 snd_pcm_t *capture_handle;
 snd_pcm_hw_params_t *hw_params;
 snd_pcm_format_t format = SND_PCM_FORMAT_S16_LE;
 
-int init(int deviceNumber, int amountChannels, int bufferFrames, int samplingRate) {
+int initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samplingRate) {
     buffer_frames = bufferFrames;
     rate = samplingRate;
+    amountChannels = amountOfChannels;
 
-    if ((err = snd_pcm_open(&capture_handle, deviceNumber, SND_PCM_STREAM_CAPTURE, 0)) < 0) {
-        fprintf(stderr, "cannot open audio device %s (%s)\n", argv[1], snd_strerror(err));
+    if ((err = snd_pcm_open(&capture_handle, "hw:1", SND_PCM_STREAM_CAPTURE, 0)) < 0) {
+        fprintf(stderr, "cannot open audio device %i (%s)\n", deviceNumber, snd_strerror(err));
         exit(1);
     }
 
@@ -75,16 +77,18 @@ int init(int deviceNumber, int amountChannels, int bufferFrames, int samplingRat
     fprintf(stdout, "hw_params setted\n");
 }
 
-void read(unsigned short *buffer, int *length) {
+int readAlsa(short **buffer) {
     //snd_pcm_format_width == the bit-width of the format
-    *length = buffer_frames * snd_pcm_format_width(format) / 8 * amountChannels;
-    if ((err = snd_pcm_readi(capture_handle, buffer, buffer_frames)) != buffer_frames) {
+    int length = buffer_frames * snd_pcm_format_width(format) / 8 * amountChannels;
+    *buffer = malloc(length);
+    if ((err = snd_pcm_readi(capture_handle, *buffer, buffer_frames)) != buffer_frames) {
         fprintf(stderr, "read from audio interface failed (%s)\n", err, snd_strerror(err));
         exit(1);
     }
+    return length;
 }
 
-void close() {
+void closeAlsa() {
     snd_pcm_close(capture_handle);
     fprintf(stdout, "audio interface closed\n");
 }

@@ -173,9 +173,9 @@ void FormToMatrix() {
 int minValue() {
     int retval = 0;
     for(int i = 1; i < ARRAYWIDTH; i++) {
-	if (display[i] < retval) {
-	    retval = display[i];
-	}
+        if (display[i] < retval) {
+            retval = display[i];
+        }
     }
     return retval;
 }
@@ -183,9 +183,9 @@ int minValue() {
 int maxValue() {
     int retval = 0;
     for(int i = 1; i < ARRAYWIDTH; i++) {
-	if (display[i] > retval) {
-	    retval = display[i];
-	}
+        if (display[i] > retval) {
+            retval = display[i];
+        }
     }
     return retval;
 }
@@ -196,6 +196,8 @@ int maxValue() {
  * @retval None
  */
 void normTo8Bit() {
+    // measure heighest values and use one of them constant.
+    const int factor = pow(2, 10);
     /*
     int minVal = minValue();
     for (int i = 0; i < ARRAYWIDTH; i++) {
@@ -210,7 +212,7 @@ void normTo8Bit() {
     */
     for (int i = 0; i < ARRAYWIDTH; i++) {
         //display[i] = display[i]/divider;
-        display[i] = display[i]*8/pow(2, 10);
+        display[i] = display[i]*8/factor;
     }
 }
 

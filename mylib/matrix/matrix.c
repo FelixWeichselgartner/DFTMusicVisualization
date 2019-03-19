@@ -123,27 +123,27 @@ void writeDisplayMatrix(int *display) {
     srand(time(NULL));
     int r, start, end;
     for  (int n = width/widthOneMatrix; n > 0; n--) {
-	start = (n - 1) * widthOneMatrix * widthOneMatrix + widthOneMatrix - 1;
-	end = (n - 1) * widthOneMatrix * widthOneMatrix;
-	if (MATRIX_DEBUG)
-	    printf("n = %i, start = %i, end = %i\n", n, start, end);
-	for (int k = start, b = (width / 8 - n) * widthOneMatrix; k >= end; k--, b++) {
-	    if (MATRIX_DEBUG)
-		printf("\tk = %2i, b = %2i\n", k, b);
-	    for (int i = 0; i < height; i++) {
-		if (MATRIX_DEBUG)
-		    printf("\t\ti = %2i, i * 8 + k = %2i\t%i", i, i * widthOneMatrix + k, display[b]);
-		if (display[b] > i) {
-		    matrix[i * widthOneMatrix + k] = dotcolors_rgbw[4];
-		    if (MATRIX_DEBUG)
-			printf("\ton\n");
-		} else {
-		    matrix[i * widthOneMatrix + k] = 0;
-		    if (MATRIX_DEBUG)
-			printf("\toff\n");
-		}
-	    }
-	}
+        start = (n - 1) * widthOneMatrix * widthOneMatrix + widthOneMatrix - 1;
+        end = (n - 1) * widthOneMatrix * widthOneMatrix;
+        if (MATRIX_DEBUG)
+            printf("n = %i, start = %i, end = %i\n", n, start, end);
+        for (int k = start, b = (width / 8 - n) * widthOneMatrix; k >= end; k--, b++) {
+            if (MATRIX_DEBUG)
+            printf("\tk = %2i, b = %2i\n", k, b);
+            for (int i = 0; i < height; i++) {
+                if (MATRIX_DEBUG)
+                    printf("\t\ti = %2i, i * 8 + k = %2i\t%i", i, i * widthOneMatrix + k, display[b]);
+                if (display[b] > i) {
+                    matrix[i * widthOneMatrix + k] = dotcolors_rgbw[4];
+                    if (MATRIX_DEBUG)
+                        printf("\ton\n");
+                } else {
+                    matrix[i * widthOneMatrix + k] = 0;
+                    if (MATRIX_DEBUG)
+                        printf("\toff\n");
+                }
+            }
+        }
     }
 }
 

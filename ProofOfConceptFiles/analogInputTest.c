@@ -2,18 +2,20 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <string.h>
 
 #include "../mylib/mcp3008/mcp3008.h"
+#include "../mylib/AlsaAPI/AlsaAPI.h"
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 
 #define NUM_CHANNELS 1
-#define SAMPLE_RATE 2*48000
+#define SAMPLE_RATE 44100
 #define SecondsOfSampling 20
-#define BLOCK_SIZE 2*480000 //512
+#define BLOCK_SIZE SAMPLE_RATE //512
 
 //compile command for main function:
-//gcc analogInputTest.c ../mylib/mcp3008/mcp3008.c -lwiringPi -o analogInputTest
+//gcc analogInputTest.c ../mylib/mcp3008/mcp3008.c ../mylib/AlsaAPI/AlsaAPI.c -lwiringPi -lasound -o analogInputTest
 
 /**
  * @brief                   samples analog values to a csv file
@@ -50,15 +52,46 @@ void analogInputTest(int spiChannel, int channelConfig, int channel) {
  * @note   
  * @retval 
  */
-int main() {
-    static int spi;
-    int channel = 0, spiChannel = 0, channelConfig = 8;
-    if (wiringPiSetup() == -1) {
-        printf("setup failed\n");
+int main(int argc, char* argv[]) {
+    if (argc > 1) {
+        if (!strcmp(argv[1], "-usb")) {
+            deviceNumber = 1;
+            amountChannels = 1;
+            bufferFrames = 128;
+            samplingRate = SAMPLE_RATE;
+            short *sample;
+            int sampleLength;
+            init(int deviceNumber, int amountChannels, int bufferFrames, int samplingRate);
+            FILE *fp;
+            fp = fopen("sample.csv", "w");
+            if (fp == NULL) {
+                printf("[Error] Couldn't create csv-file");
+                exit(1);
+            }
+
+            do {
+                read(sample, &sampleLength);
+                for (int i = 0; i < length; i++) {
+                    fprintf(fp, "%i;\n", sample[i]);
+                    free(sample);
+                }
+            } while (difftime(time(0), start) < SecondsOfSampling);
+            
+            fclose(fp);
+            close();
+            exit(1);
+        }
+    } else {
+        static int spi;
+        int channel = 0, spiChannel = 0, channelConfig = 8;
+        if (wiringPiSetup() == -1)
+        {
+            printf("setup failed\n");
+            return 0;
+        }
+        spi = spiSetup(spiChannel);
+        analogInputTest(spiChannel, channelConfig, channel);
+        close(spi);
         return 0;
-    }
-    spi = spiSetup(spiChannel);
-    analogInputTest(spiChannel, channelConfig, channel);
-    close(spi);
-    return 0;
+    }    
 }

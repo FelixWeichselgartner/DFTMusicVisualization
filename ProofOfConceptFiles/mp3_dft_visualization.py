@@ -89,7 +89,7 @@ def main():
     those are then normed to 0 <= value <= 8 to be displayed on an led Matrix with size 8 on 8
     """
 
-    filename = 'em.mp3'
+    filename = 'sample_python.mp3'
     #filename = input('what is your filename?')
 
     song = AudioSegment.from_mp3(filename)
@@ -106,7 +106,7 @@ def main():
     print(f'the number of frames per second = {framespersecond}')
     print(f'the song has {channel_count} channels')
 
-    part = song[35000:40000]
+    part = song[0:]
 
     print(f'length of the current part {len(part)/1000} seconds')
 

@@ -11,7 +11,11 @@ def ConvertListToWav(name, theList):
     for i in theList:
         arr[count] = i
         count += 1
-    ConvertNumpyToWav(name, arr, 30000)
+		
+    try:
+	ConvertNumpyToWav(name, arr, 30000)
+    except:
+	sys.exit("usage: python3 NumpyToWAV.py <sampling frequency>")
 
 
 def main():
@@ -26,4 +30,4 @@ def main():
         ConvertListToWav('sample_python', signal)
 
 if __name__ == "__main__":
-    main()
+main()

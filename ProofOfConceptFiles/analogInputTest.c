@@ -55,7 +55,7 @@ void analogInputTest(int spiChannel, int channelConfig, int channel) {
 int main(int argc, char* argv[]) {
     if (argc > 1) {
         if (!strcmp(argv[1], "-usb")) {
-	    int delaytime = 1 / SAMPLE_RATE * 1000 * 1000;
+	        int delaytime = 1 / SAMPLE_RATE * 1000 * 1000;
     	    time_t start = time(0);
 
             int deviceNumber = 1, amountChannels = 1, bufferFrames = 128, samplingRate = SAMPLE_RATE, sampleLength;
@@ -74,17 +74,17 @@ int main(int argc, char* argv[]) {
             //do {
                 sampleLength = readAlsa(&sample);
 
-		if (sample == NULL) {
-		    printf("[SampleError] error occured memory related while sampling");
-		    exit(1);
-		}
+                if (sample == NULL) {
+                    printf("[SampleError] error occured memory related while sampling");
+                    exit(1);
+                }
 
                 for (int i = 0; i < sampleLength; i++) {
                     fprintf(fp, "%i;\n", sample[i]);
                 }
 
-		free(sample);
-		sample = NULL;
+                free(sample);
+                sample = NULL;
 
             //} while (difftime(time(0), start) < SecondsOfSampling);
 
@@ -95,8 +95,7 @@ int main(int argc, char* argv[]) {
     } else {
         static int spi;
         int channel = 0, spiChannel = 0, channelConfig = 8;
-        if (wiringPiSetup() == -1)
-        {
+        if (wiringPiSetup() == -1) {
             printf("setup failed\n");
             return 0;
         }

@@ -5,90 +5,124 @@ https://gist.github.com/albanpeignier/104902
 
 #include "AlsaAPI.h"
 
-// global variables
-int i;
-int err;
-int buffer_frames; //128
-unsigned int rate; //44100
-int amountChannels;
-snd_pcm_t *capture_handle;
-snd_pcm_hw_params_t *hw_params;
-snd_pcm_format_t format = SND_PCM_FORMAT_S16_LE;
+// global variables.
+struct alsaVariables {
+    int err;
+    int buffer_frames; //128
+    unsigned int rate; //44100
+    int amountChannels;
+    snd_pcm_t *capture_handle;
+    snd_pcm_hw_params_t *hw_params;
+    snd_pcm_format_t format = SND_PCM_FORMAT_S16_LE;
+};
 
-int initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samplingRate) {
-    buffer_frames = bufferFrames;
-    rate = samplingRate;
-    amountChannels = amountOfChannels;
+struct alsaVariables myVar;
 
-    if ((err = snd_pcm_open(&capture_handle, "hw:1", SND_PCM_STREAM_CAPTURE, 0)) < 0) {
-        fprintf(stderr, "cannot open audio device %i (%s)\n", deviceNumber, snd_strerror(err));
+/**
+ * @brief  initialise the alsa session.
+ * @note   
+ * @param  deviceNumber:        the device number of the device to use with alsa.
+ * @param  amountOfChannels:    number of audio channels to record.
+ * @param  bufferFrames:        the amount of frames for a buffer to hold.
+ * @param  samplingRate:        the rate to sample with.
+ * @retval 
+ */
+void initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samplingRate) {
+    myVar.buffer_frames = bufferFrames;
+    myVar.rate = samplingRate;
+    myVar.amountChannels = amountOfChannels;
+
+    // open pcm device for recording (capture).
+    if ((myVar.err = snd_pcm_open(&myVar.capture_handle, "hw:1", SND_PCM_STREAM_CAPTURE, 0)) < 0) {
+        fprintf(stderr, "cannot open audio device %i (%s)\n", deviceNumber, snd_strerror(myVar.err));
         exit(1);
     }
 
     fprintf(stdout, "audio interface opened\n");
 
-    if ((err = snd_pcm_hw_params_malloc(&hw_params)) < 0) {
-        fprintf(stderr, "cannot allocate hardware parameter structure (%s)\n", snd_strerror(err));
+    // allocate a hardware parameters object.
+    if ((myVar.err = snd_pcm_hw_params_malloc(&myVar.hw_params)) < 0) {
+        fprintf(stderr, "cannot allocate hardware parameter structure (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
 
     fprintf(stdout, "hw_params allocated\n");
 
-    if ((err = snd_pcm_hw_params_any(capture_handle, hw_params)) < 0) {
-        fprintf(stderr, "cannot initialize hardware parameter structure (%s)\n", snd_strerror(err));
+    // fill hardware parameters object with default values.
+    if ((myVar.err = snd_pcm_hw_params_any(myVar.capture_handle, myVar.hw_params)) < 0) {
+        fprintf(stderr, "cannot initialize hardware parameter structure (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
 
     fprintf(stdout, "hw_params initialized\n");
 
-    if ((err = snd_pcm_hw_params_set_access(capture_handle, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED)) < 0) {
-        fprintf(stderr, "cannot set access type (%s)\n", snd_strerror(err));
+    // interleaved mode.
+    if ((myVar.err = snd_pcm_hw_params_set_access(myVar.capture_handle, myVar.hw_params, SND_PCM_ACCESS_RW_INTERLEAVED)) < 0) {
+        fprintf(stderr, "cannot set access type (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
 
     fprintf(stdout, "hw_params access setted\n");
 
-    if ((err = snd_pcm_hw_params_set_format(capture_handle, hw_params, format)) < 0) {
-        fprintf(stderr, "cannot set sample format (%s)\n", snd_strerror(err));
+    // signed 16-bit little-endian format.
+    if ((err = snd_pcm_hw_params_set_format(myVar.capture_handle, myVar.hw_params, myVar.format)) < 0) {
+        fprintf(stderr, "cannot set sample format (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
 
     fprintf(stdout, "hw_params format setted\n");
 
-    if ((err = snd_pcm_hw_params_set_rate_near(capture_handle, hw_params, &rate, 0)) < 0) {
-        fprintf(stderr, "cannot set sample rate (%s)\n", snd_strerror(err));
+    // set sampling rate. (44100)
+    if ((myVar.err = snd_pcm_hw_params_set_rate_near(myVar.capture_handle, myVar.hw_params, &myVar.rate, 0)) < 0) {
+        fprintf(stderr, "cannot set sample rate (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
 
     fprintf(stdout, "hw_params rate setted\n");
 
-    if ((err = snd_pcm_hw_params_set_channels(capture_handle, hw_params, amountChannels)) < 0) {
-        fprintf(stderr, "cannot set channel count (%s)\n", snd_strerror(err));
+    // set channels. (2)
+    if ((myVar.err = snd_pcm_hw_params_set_channels(myVar.capture_handle, myVar.hw_params, myVar.amountChannels)) < 0) {
+        fprintf(stderr, "cannot set channel count (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
 
     fprintf(stdout, "hw_params channels setted\n");
 
-    if ((err = snd_pcm_hw_params(capture_handle, hw_params)) < 0) {
-        fprintf(stderr, "cannot set parameters (%s)\n", snd_strerror(err));
+    // write the parameters to the driver.
+    if ((myVar.err = snd_pcm_hw_params(myVar.capture_handle, myVar.hw_params)) < 0) {
+        fprintf(stderr, "cannot set parameters (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
 
     fprintf(stdout, "hw_params setted\n");
 }
 
+/**
+ * @brief  read data from alsa.
+ * @note   
+ * @param  **buffer: pointer to which content the adress 
+ *                   of the sampled material should be written to.
+ * @retval length of the sampled material
+ */
 int readAlsa(short **buffer) {
-    //snd_pcm_format_width == the bit-width of the format
-    int length = buffer_frames * snd_pcm_format_width(format) / 8 * amountChannels;
+    // snd_pcm_format_width == the bit-width of the format
+    // length is probably too long
+    // int length = myVar.buffer_frames * snd_pcm_format_width(myVar.format) / 8 * myVar.amountChannels;
+    int length = buffer_frames * 4; // for 2 channels and 2 bytes / sampe ( == 16 bit)
     *buffer = malloc(length);
-    if ((err = snd_pcm_readi(capture_handle, *buffer, buffer_frames)) != buffer_frames) {
-        fprintf(stderr, "read from audio interface failed (%s)\n", err, snd_strerror(err));
+    if ((myVar.err = snd_pcm_readi(myVar.capture_handle, *buffer, myVar.buffer_frames)) != myVar.buffer_frames) {
+        fprintf(stderr, "read from audio interface failed (%s)\n", err, snd_strerror(myVar.err));
         exit(1);
     }
     return length;
 }
 
+/**
+ * @brief  close alsa session.
+ * @note   
+ * @retval None
+ */
 void closeAlsa() {
-    snd_pcm_close(capture_handle);
+    snd_pcm_close(myVar.capture_handle);
     fprintf(stdout, "audio interface closed\n");
 }

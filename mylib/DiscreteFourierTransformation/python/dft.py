@@ -19,6 +19,16 @@ from cmath import exp
 from math import atan as arctan
 
 def arctan2(x, y):
+    """implementation of the arctan2
+    
+    Arguments:
+        x {double} -- x value
+        y {double} -- y value
+    
+    Returns:
+        double -- angle in radian
+    """
+
     #values = ]-pi;pi]
     if x>0:
         return arctan(y/x)
@@ -38,10 +48,27 @@ def arctan2(x, y):
             return -pi/2
 
 def angle(X):
-    #print(f'X = {X}')
+    """calculates the angle of a complex number
+    
+    Arguments:
+        X {complex number} -- the complex number to calculate the angle for
+    
+    Returns:
+        double -- the angle in radian
+    """
+
     return arctan2(X.real, X.imag)
     
 def dft(x):
+    """implementation of the discrete fourier transformation
+    
+    Arguments:
+        x {list} -- list of values to fourier transform
+    
+    Returns:
+        [list] -- list of the fourier transformed data
+    """
+
     N = len(x)
     X = [None] * N
     l = 0
@@ -58,6 +85,15 @@ def idft(x):
     pass
 
 def fft(x):
+    """implementation of the fast fourier transformation.
+    
+    Arguments:
+        x {list} -- list of values to fourier transform
+    
+    Returns:
+        list -- list of the fourier transformed data
+    """
+
     N = len(x)
     max = int(N/2)
 

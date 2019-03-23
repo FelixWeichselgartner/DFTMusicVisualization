@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <alsa/asoundlib.h>
 
-int initAlsa(int, int, int, int);
+void initAlsa(int, int, int, int);
 int readAlsa(short **);
 void closeAlsa();
 

@@ -1,9 +1,28 @@
 def zeroPadding(function, n):
+    """adds zeros to a list -> zero padding to increase frequency resolution.
+    
+    Arguments:
+        function {list} -- function discrete in a list
+        n {integer} -- amount of zeros to append
+    
+    Returns:
+        list -- function with the added zeros
+    """
+
     for x in range(n):
         function.append(0)
     return function
 
 def zeroPaddingToNextPOW2N(function):
+    """adds the amount of zeros to get len(function) to be pow(2, n), with n being the next higher power of 2.
+    
+    Arguments:
+        function {list} -- function discrete in a list
+        
+    Returns:
+        list -- function with the added zeros
+    """
+
     length = len(function)
     n = 1
     while length > pow(2, n):

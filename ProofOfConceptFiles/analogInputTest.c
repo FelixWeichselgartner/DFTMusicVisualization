@@ -11,7 +11,7 @@
 
 #define NUM_CHANNELS 1
 #define SAMPLE_RATE 44100
-#define SecondsOfSampling 20
+#define SAMPLING_TIME 20
 #define BLOCK_SIZE SAMPLE_RATE //512
 
 //compile command for main function:
@@ -41,7 +41,7 @@ void analogInputTest(int spiChannel, int channelConfig, int channel) {
         v = mcpAnalogRead(spiChannel, channelConfig, channel);
         fprintf(fp, "%i\n", v);
         delayMicroseconds(delaytime);
-    } while(difftime(time(0), start) < SecondsOfSampling);
+    } while(difftime(time(0), start) < SAMPLING_TIME);
 
     fclose(fp);
     return;
@@ -53,12 +53,13 @@ void analogInputTest(int spiChannel, int channelConfig, int channel) {
  * @retval 
  */
 int main(int argc, char* argv[]) {
+    printf("> You are running: The Analog Input Test!");
     if (argc > 1) {
         if (!strcmp(argv[1], "-usb")) {
 	        int delaytime = 1 / SAMPLE_RATE * 1000 * 1000;
     	    time_t start = time(0);
 
-            int deviceNumber = 1, amountChannels = 1, bufferFrames = 128, samplingRate = SAMPLE_RATE, sampleLength;
+            int deviceNumber = 1, amountChannels = 2, bufferFrames = 128, samplingRate = SAMPLE_RATE, sampleLength;
             short *sample = NULL;
 
             initAlsa(deviceNumber, amountChannels, bufferFrames, samplingRate);
@@ -70,8 +71,9 @@ int main(int argc, char* argv[]) {
                 printf("[Error] Couldn't create csv-file");
                 exit(1);
             }
-
-            //do {
+printf("in front of do-while loop\n");
+            do {
+		printf("sampleLoop ");
                 sampleLength = readAlsa(&sample);
 
                 if (sample == NULL) {
@@ -80,13 +82,13 @@ int main(int argc, char* argv[]) {
                 }
 
                 for (int i = 0; i < sampleLength; i++) {
-                    fprintf(fp, "%i;\n", sample[i]);
+                    fprintf(fp, "%i;\n", sample[i + 2]);
                 }
 
                 free(sample);
                 sample = NULL;
 
-            //} while (difftime(time(0), start) < SecondsOfSampling);
+            } while (difftime(time(0), start) < SAMPLING_TIME);
 
             fclose(fp);
             closeAlsa();

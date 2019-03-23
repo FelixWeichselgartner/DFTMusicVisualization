@@ -5,7 +5,7 @@ https://gist.github.com/albanpeignier/104902
 
 #include "AlsaAPI.h"
 
-// global variables.
+// struct for variables needed.
 struct alsaVariables {
     int err;
     int buffer_frames; //128
@@ -13,7 +13,7 @@ struct alsaVariables {
     int amountChannels;
     snd_pcm_t *capture_handle;
     snd_pcm_hw_params_t *hw_params;
-    snd_pcm_format_t format = SND_PCM_FORMAT_S16_LE;
+    snd_pcm_format_t format;
 };
 
 struct alsaVariables myVar;
@@ -31,6 +31,8 @@ void initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samp
     myVar.buffer_frames = bufferFrames;
     myVar.rate = samplingRate;
     myVar.amountChannels = amountOfChannels;
+
+    myVar.format = SND_PCM_FORMAT_S16_LE;
 
     // open pcm device for recording (capture).
     if ((myVar.err = snd_pcm_open(&myVar.capture_handle, "hw:1", SND_PCM_STREAM_CAPTURE, 0)) < 0) {
@@ -65,7 +67,7 @@ void initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samp
     fprintf(stdout, "hw_params access setted\n");
 
     // signed 16-bit little-endian format.
-    if ((err = snd_pcm_hw_params_set_format(myVar.capture_handle, myVar.hw_params, myVar.format)) < 0) {
+    if ((myVar.err = snd_pcm_hw_params_set_format(myVar.capture_handle, myVar.hw_params, myVar.format)) < 0) {
         fprintf(stderr, "cannot set sample format (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
@@ -108,10 +110,10 @@ int readAlsa(short **buffer) {
     // snd_pcm_format_width == the bit-width of the format
     // length is probably too long
     // int length = myVar.buffer_frames * snd_pcm_format_width(myVar.format) / 8 * myVar.amountChannels;
-    int length = buffer_frames * 4; // for 2 channels and 2 bytes / sampe ( == 16 bit)
+    int length = myVar.buffer_frames * 4; // for 2 channels and 2 bytes / sampe ( == 16 bit)
     *buffer = malloc(length);
     if ((myVar.err = snd_pcm_readi(myVar.capture_handle, *buffer, myVar.buffer_frames)) != myVar.buffer_frames) {
-        fprintf(stderr, "read from audio interface failed (%s)\n", err, snd_strerror(myVar.err));
+        fprintf(stderr, "read from audio interface failed (%s)\n", myVar.err, snd_strerror(myVar.err));
         exit(1);
     }
     return length;

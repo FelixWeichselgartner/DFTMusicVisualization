@@ -1,46 +1,39 @@
-# -*- coding: UTF-8 -*-
-""" Record voice
-"""
-
-DEVICE = "plughw:1"
+#!/usr/bin/python
+## This is an example of a simple sound capture script.
+##
+## The script opens an ALSA pcm for sound capture. Set
+## various attributes of the capture, and reads in a loop,
+## Then prints the volume.
+##
+## To test it out, run it and shout at your microphone:
 
 import alsaaudio
 import time
+import audioop
 
+# Open the device in nonblocking capture mode. The last argument could
+# just as well have been zero for blocking mode. Then we could have
+# left out the sleep call in the bottom of the loop
+inp = alsaaudio.PCM(alsaaudio.PCM_CAPTURE, alsaaudio.PCM_NONBLOCK)
 
-class RecordVoice(object):
-    """ Record voice Module
-    """
+# Set attributes: Mono, 44100 Hz, 16 bit little endian samples
+inp.setchannels(1)
+inp.setrate(44100)
+inp.setformat(alsaaudio.PCM_FORMAT_S16_LE)
 
-    RECORD_FILE = "recording.wav"
-    RESPONSE_FILE = "response.mp3"
+# The period size controls the internal number of frames per period.
+# The significance of this parameter is documented in the ALSA api.
+# For our purposes, it is suficcient to know that reads from the device
+# will return this many frames. Each frame being 2 bytes long.
+# This means that the reads below will return either 320 bytes of data
+# or 0 bytes of data. The latter is possible because we are in nonblocking
+# mode.
+inp.setperiodsize(160)
 
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def record():
-        """ Record voice
-        """
-        seconds = 10
-        t_end = time.time() + 60 * seconds
-
-        inp = alsaaudio.PCM(alsaaudio.PCM_CAPTURE,
-                            alsaaudio.PCM_NORMAL, DEVICE)
-        inp.setchannels(1)
-        inp.setrate(44100)
-        inp.setformat(alsaaudio.PCM_FORMAT_S16_LE)
-        inp.setperiodsize(500)
-
-        audio = ""
-        # we keep recording while the button is pressed
-        while time.time() < t_end:
-            valid, data = inp.read()
-            if valid:
-                audio += data
-        save_audio = open("sample.wav", 'w')
-        save_audio.write(audio)
-        save_audio.close()
-
-if __name__ == "__main__":
-    RecordVoice.record()
+while True:
+    # Read data from device
+    l, data = inp.read()
+    if l:
+        # Return the maximum of the absolute value of all samples in a fragment.
+        print(audioop.max(data, 2))
+    time.sleep(.001)

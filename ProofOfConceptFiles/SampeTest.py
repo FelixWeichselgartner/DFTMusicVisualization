@@ -30,10 +30,14 @@ inp.setformat(alsaaudio.PCM_FORMAT_S16_LE)
 # mode.
 inp.setperiodsize(160)
 
+file = open("OutputPCM.pcm", "w")
+
 while True:
     # Read data from device
     l, data = inp.read()
     if l:
         # Return the maximum of the absolute value of all samples in a fragment.
         print(audioop.max(data, 2))
+        for i in data:
+            file.write(f'{i}\n')
     time.sleep(.001)

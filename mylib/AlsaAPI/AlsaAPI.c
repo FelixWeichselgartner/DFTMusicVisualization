@@ -17,6 +17,7 @@ struct alsaVariables {
     snd_pcm_t *capture_handle;
     snd_pcm_hw_params_t *hw_params;
     snd_pcm_format_t format;
+    snd_pcm_uframes_t frames;
 };
 
 struct alsaVariables myVar;
@@ -34,6 +35,7 @@ void initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samp
     myVar.buffer_frames = bufferFrames;
     myVar.rate = samplingRate;
     myVar.amountChannels = amountOfChannels;
+    myVar.frames = bufferFrames;
 
     myVar.format = SND_PCM_FORMAT_S16_LE;
 
@@ -86,7 +88,7 @@ void initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samp
     fprintf(stdout, "hw_params rate setted\n");
 
     // set period size to myVar.buffer_frames frames.
-    if ((myVar.err = snd_pcm_hw_params_set_period_size_near(myVar.capture_handle, myVar.hw_params, &myVar.buffer_frames, &myVar.dir))) {
+    if ((myVar.err = snd_pcm_hw_params_set_period_size_near(myVar.capture_handle, myVar.hw_params, &myVar.frames, &myVar.dir))) {
         fprintf(stderr, "cannot set period size (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
@@ -116,10 +118,10 @@ void initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samp
  * @retval size of the sampled material
  */
 int readAlsa(short **buffer) {
-    snd_pcm_hw_params_get_period_size(myVar.hw_params, &myVar.buffer_frames, &myVar.dir);
-    int size = myVar.buffer_frames *snd_pcm_format_width(myVar.format) / 8 * myVar.amountChannels;
+    snd_pcm_hw_params_get_period_size(myVar.hw_params, &myVar.frames, &myVar.dir);
+    int size = myVar.frames *snd_pcm_format_width(myVar.format) / 8 * myVar.amountChannels;
     *buffer = malloc(size);
-    if ((myVar.err = snd_pcm_readi(myVar.capture_handle, *buffer, myVar.buffer_frames)) != myVar.buffer_frames) {
+    if ((myVar.err = snd_pcm_readi(myVar.capture_handle, *buffer, myVar.frames)) != myVar.frames) {
         fprintf(stderr, "read from audio interface failed (%s)\n", myVar.err, snd_strerror(myVar.err));
         exit(1);
     }
@@ -133,8 +135,8 @@ int readAlsa(short **buffer) {
  * @retval None
  */
 void recordForSeconds(int seconds) {
-    snd_pcm_hw_params_get_period_size(myVar.hw_params, &myVar.buffer_frames, &myVar.dir);
-    int size = myVar.buffer_frames * snd_pcm_format_width(myVar.format) / 8 * myVar.amountChannels;
+    snd_pcm_hw_params_get_period_size(myVar.hw_params, &myVar.frames, &myVar.dir);
+    int size = myVar.frames * snd_pcm_format_width(myVar.format) / 8 * myVar.amountChannels;
     char *buffer = malloc(size);
 
     int val;
@@ -143,13 +145,13 @@ void recordForSeconds(int seconds) {
 
     int rc;
     for (int i = loops; i > 0; i--) {
-        rc = snd_pcm_readi(myVar.capture_handle, buffer, myVar.buffer_frames);
+        rc = snd_pcm_readi(myVar.capture_handle, buffer, myVar.frames);
         if (rc == -EPIPE) {
             fprintf(stderr, "overrun occured}n");
             snd_pcm_prepare(myVar.capture_handle);
         } else if (rc < 0) {
             fprintf(stderr, "error from read %s\n", snd_strerror(rc));
-        } else if (rc != (int)myVar.buffer_frames) {
+        } else if (rc != (int)myVar.frames) {
             fprintf(stderr, "short read, read %i frames\n", rc);
         }
 

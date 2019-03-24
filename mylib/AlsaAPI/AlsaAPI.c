@@ -48,10 +48,12 @@ void initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samp
     fprintf(stdout, "audio interface opened\n");
 
     // allocate a hardware parameters object.
-    if ((myVar.err = snd_pcm_hw_params_alloca(&myVar.hw_params)) < 0) {
+    snd_pcm_hw_params_alloca(&myVar.hw_params)
+    /* if ((myVar.err = snd_pcm_hw_params_alloca(&myVar.hw_params)) < 0)
+    {
         fprintf(stderr, "cannot allocate hardware parameter structure (%s)\n", snd_strerror(myVar.err));
         exit(1);
-    }
+    }*/
 
     fprintf(stdout, "hw_params allocated\n");
 

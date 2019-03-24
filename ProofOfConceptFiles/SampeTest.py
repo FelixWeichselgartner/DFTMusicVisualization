@@ -35,9 +35,9 @@ file = open("OutputPCM.pcm", "w")
 while True:
     # Read data from device
     l, data = inp.read()
-    if l:
+    #if l:
         # Return the maximum of the absolute value of all samples in a fragment.
-        print(audioop.max(data, 2))
+        #print(audioop.max(data, 2))
     for i in data:
-            file.write(f'{i}\n')
+            file.write(str(i) + '\n')
     time.sleep(.001)

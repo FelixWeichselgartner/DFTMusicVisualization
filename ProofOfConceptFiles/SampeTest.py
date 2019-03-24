@@ -38,6 +38,6 @@ while True:
     if l:
         # Return the maximum of the absolute value of all samples in a fragment.
         print(audioop.max(data, 2))
-        for i in data:
+    for i in data:
             file.write(f'{i}\n')
     time.sleep(.001)

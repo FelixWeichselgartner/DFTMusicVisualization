@@ -1,4 +1,4 @@
-from neopixel import *
+from lib.rpi_ws281x.python.neopixel import *
 import time
 
 class Matrix(object):
@@ -31,15 +31,18 @@ class Matrix(object):
             led_brightness
             )
         
-        strip.begin()
+        self.strip.begin()
 
-    def clearMatrix():
-        for i in range(strip.numPixels()):
-            strip.setPixelColor(i, Color(0, 0, 0))
-            strip.show()
-            time.sleep(wait_ms/1000)
+    def clearMatrix(self):
+        print('led count is ' + str(self.led_count))
+        for i in range(self.led_count):
+            print(i)
+            self.strip.setPixelColor(i, Color(0, 0, 0))
+            #self.strip.show()
+            time.sleep(self.wait_ms/1000)
+        self.strip.show()
     
-    def arrayToMatrix(arr):
+    def arrayToMatrix(self, arr):
         widthOneMatrix = 8
         r, start, end = 0, 0, 0
         for i in range(width/widthOneMatrix, 0, -1):
@@ -49,7 +52,12 @@ class Matrix(object):
             for k in range(start, end, -1):
                 for l in range(height):
                     if display[b] > i:
-                        strip.setPixelColor(i * widthOneMatrix + k, Color(255, 0, 0))
+                        self.strip.setPixelColor(i * widthOneMatrix + k, Color(255, 0, 0))
                     else:
-                        strip.setPixelColor(i * widthOneMatrix + k, Color(0, 0, 0))
+                        self.strip.setPixelColor(i * widthOneMatrix + k, Color(0, 0, 0))
+                self.strip.show()
+                time.sleep(self.wait_ms/1000)
                 b += 1
+
+    def setBrightness(self, value):
+        self.strip.setBrightness(value)

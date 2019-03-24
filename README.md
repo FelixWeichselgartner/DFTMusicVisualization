@@ -14,6 +14,12 @@ sudo apt-get install scons
 ```
 Then run `scons` to install the library.
 After that you will have to delete the main.c file in the new folder lib/rpi_ws281x
+Then:
+```
+cd python
+sudo python3 setup.py build
+sudo python3 setup.py install
+```
 
 
 Then run:

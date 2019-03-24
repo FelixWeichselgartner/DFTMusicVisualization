@@ -2,7 +2,7 @@
 """ Record voice
 """
 
-from lib import BUTTON, DEVICE, AUDIBLE_PATH
+DEVICE = "plughw:1"
 
 import alsaaudio
 import time
@@ -41,3 +41,6 @@ class RecordVoice(object):
         save_audio = open("sample.wav", 'w')
         save_audio.write(audio)
         save_audio.close()
+
+if __name__ == "__main__":
+    RecordVoice.record()

@@ -159,6 +159,8 @@ void recordForSeconds(int seconds) {
         }
     }
 
+    snd_pcm_drain(myVar.capture_handle);
+    snd_pcm_close(myVar.capture_handle);
     free(buffer);
 }
 

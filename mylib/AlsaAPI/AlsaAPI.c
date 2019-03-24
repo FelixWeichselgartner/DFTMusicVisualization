@@ -5,9 +5,12 @@ https://gist.github.com/albanpeignier/104902
 
 #include "AlsaAPI.h"
 
+#define ALSA_PCM_NEW_HW_PARAMS_API
+
 // struct for variables needed.
 struct alsaVariables {
     int err;
+    int dir;
     int buffer_frames; //128
     unsigned int rate; //44100
     int amountChannels;
@@ -43,7 +46,7 @@ void initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samp
     fprintf(stdout, "audio interface opened\n");
 
     // allocate a hardware parameters object.
-    if ((myVar.err = snd_pcm_hw_params_malloc(&myVar.hw_params)) < 0) {
+    if ((myVar.err = snd_pcm_hw_params_alloca(&myVar.hw_params)) < 0) {
         fprintf(stderr, "cannot allocate hardware parameter structure (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
@@ -67,7 +70,7 @@ void initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samp
     fprintf(stdout, "hw_params access setted\n");
 
     // signed 16-bit little-endian format.
-    if ((myVar.err = snd_pcm_hw_params_set_format(myVar.capture_handle, myVar.hw_params, myVar.format)) < 0) {
+    if ((myVar.err = snd_pcm_hw_params_set_format(myVar.capture_handle, myVar.hw_params, SND_PCM_FORMAT_S16_LE)) < 0) { //myVar.format
         fprintf(stderr, "cannot set sample format (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
@@ -75,12 +78,18 @@ void initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samp
     fprintf(stdout, "hw_params format setted\n");
 
     // set sampling rate. (44100)
-    if ((myVar.err = snd_pcm_hw_params_set_rate_near(myVar.capture_handle, myVar.hw_params, &myVar.rate, 0)) < 0) {
+    if ((myVar.err = snd_pcm_hw_params_set_rate_near(myVar.capture_handle, myVar.hw_params, &myVar.rate, &myVar.dir)) < 0) {
         fprintf(stderr, "cannot set sample rate (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
 
     fprintf(stdout, "hw_params rate setted\n");
+
+    // set period size to myVar.buffer_frames frames.
+    if ((myVar.err = snd_pcm_hw_params_set_period_size_near(myVar.capture_handle, myVar.hw_params, &myVar.buffer_frames, &myVar.dir))) {
+        fprinf(stderr, "cannot set period size (%s)\n", snd_strerror(myVar.err));
+        exit(1);
+    }
 
     // set channels. (2)
     if ((myVar.err = snd_pcm_hw_params_set_channels(myVar.capture_handle, myVar.hw_params, myVar.amountChannels)) < 0) {
@@ -104,19 +113,53 @@ void initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samp
  * @note   
  * @param  **buffer: pointer to which content the adress 
  *                   of the sampled material should be written to.
- * @retval length of the sampled material
+ * @retval size of the sampled material
  */
 int readAlsa(short **buffer) {
-    // snd_pcm_format_width == the bit-width of the format
-    // length is probably too long
-    // int length = myVar.buffer_frames * snd_pcm_format_width(myVar.format) / 8 * myVar.amountChannels;
-    int length = myVar.buffer_frames * 4; // for 2 channels and 2 bytes / sampe ( == 16 bit)
-    *buffer = malloc(length);
+    snd_pcm_hw_params_get_period_size(myVar.hw_params, &myVar.buffer_frames, &myVar.dir);
+    int size = myVar.buffer_frames *snd_pcm_format_width(myVar.format) / 8 * myVar.amountChannels;
+    *buffer = malloc(size);
     if ((myVar.err = snd_pcm_readi(myVar.capture_handle, *buffer, myVar.buffer_frames)) != myVar.buffer_frames) {
         fprintf(stderr, "read from audio interface failed (%s)\n", myVar.err, snd_strerror(myVar.err));
         exit(1);
     }
-    return length;
+    return size;
+}
+
+/**
+ * @brief  record raw pcm for a certain amount of seconds.
+ * @note   
+ * @param  seconds: the amount of seconds to record.
+ * @retval None
+ */
+void recordForSeconds(int seconds) {
+    snd_pcm_hw_params_get_period_size(myVar.hw_params, &myVar.buffer_frames, &myVar.dir);
+    int size = myVar.buffer_frames * snd_pcm_format_width(myVar.format) / 8 * myVar.amountChannels;
+    *buffer = malloc(size);
+
+    int val;
+    snd_pcm_hw_params_get_period_time(myVar.hw_params, &val, &myVar.dir);
+    int loops = seconds * 1000000 / val;
+
+    int rc;
+    for (int i = loops; i > 0; i--) {
+        rc = snd_pcm_readi(myVar.capture_handle, buffer, myVar.buffer_frames);
+        if (rc == -EPIPE) {
+            fprintf(stderr, "overrun occured}n");
+            snd_pcm_prepare(myVar.capture_handle);
+        } else if (rc < 0) {
+            fprintf(stderr, "error from read %s\n", snd_stderror(rc));
+        } else if (rc != (int)myVar.buffer_frames) {
+            fprintf(stderr, "short read, read %i frames\n", rc);
+        }
+
+        if (fwrite(buffer, size, 1, stdout) != 1) {
+            fflush(stdout);
+            fprintf(stderr, "Error writing to standard output.\n");
+        }
+    }
+
+    free(buffer);
 }
 
 /**

@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 	        int delaytime = 1 / SAMPLE_RATE * 1000 * 1000;
     	    time_t start = time(0);
 
-            int deviceNumber = 1, amountChannels = 2, bufferFrames = 128, samplingRate = SAMPLE_RATE, sampleLength;
+            int deviceNumber = 1, amountChannels = 2, bufferFrames = 32, samplingRate = SAMPLE_RATE, sampleLength;
             short *sample = NULL;
 
             initAlsa(deviceNumber, amountChannels, bufferFrames, samplingRate);
@@ -71,9 +71,8 @@ int main(int argc, char* argv[]) {
                 printf("[Error] Couldn't create csv-file");
                 exit(1);
             }
-printf("in front of do-while loop\n");
+
             do {
-		printf("sampleLoop ");
                 sampleLength = readAlsa(&sample);
 
                 if (sample == NULL) {
@@ -94,6 +93,11 @@ printf("in front of do-while loop\n");
             closeAlsa();
             exit(1);
         }
+    } else if (!strcmp(argv[1], "-s") {
+        int deviceNumber = 1, amountChannels = 2, bufferFrames = 32, samplingRate = SAMPLE_RATE;
+        initAlsa(deviceNumber, amountChannels, bufferFrames, samplingRate);
+        recordForSeconds(10);
+        closeAlsa();
     } else {
         static int spi;
         int channel = 0, spiChannel = 0, channelConfig = 8;
@@ -105,5 +109,5 @@ printf("in front of do-while loop\n");
         analogInputTest(spiChannel, channelConfig, channel);
         close(spi);
         return 0;
-    }    
+    }
 }

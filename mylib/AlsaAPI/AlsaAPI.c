@@ -87,7 +87,7 @@ void initAlsa(int deviceNumber, int amountOfChannels, int bufferFrames, int samp
 
     // set period size to myVar.buffer_frames frames.
     if ((myVar.err = snd_pcm_hw_params_set_period_size_near(myVar.capture_handle, myVar.hw_params, &myVar.buffer_frames, &myVar.dir))) {
-        fprinf(stderr, "cannot set period size (%s)\n", snd_strerror(myVar.err));
+        fprintf(stderr, "cannot set period size (%s)\n", snd_strerror(myVar.err));
         exit(1);
     }
 
@@ -135,7 +135,7 @@ int readAlsa(short **buffer) {
 void recordForSeconds(int seconds) {
     snd_pcm_hw_params_get_period_size(myVar.hw_params, &myVar.buffer_frames, &myVar.dir);
     int size = myVar.buffer_frames * snd_pcm_format_width(myVar.format) / 8 * myVar.amountChannels;
-    *buffer = malloc(size);
+    char *buffer = malloc(size);
 
     int val;
     snd_pcm_hw_params_get_period_time(myVar.hw_params, &val, &myVar.dir);
@@ -148,7 +148,7 @@ void recordForSeconds(int seconds) {
             fprintf(stderr, "overrun occured}n");
             snd_pcm_prepare(myVar.capture_handle);
         } else if (rc < 0) {
-            fprintf(stderr, "error from read %s\n", snd_stderror(rc));
+            fprintf(stderr, "error from read %s\n", snd_strerror(rc));
         } else if (rc != (int)myVar.buffer_frames) {
             fprintf(stderr, "short read, read %i frames\n", rc);
         }

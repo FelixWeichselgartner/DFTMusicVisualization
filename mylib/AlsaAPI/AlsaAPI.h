@@ -7,6 +7,7 @@
 
 void initAlsa(int, int, int, int);
 int readAlsa(short **);
+void recordForSeconds(int);
 void closeAlsa();
 
 #endif

@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
             closeAlsa();
             exit(1);
         }
-    } else if (!strcmp(argv[1], "-s") {
+    } else if (!strcmp(argv[1], "-s")) {
         int deviceNumber = 1, amountChannels = 2, bufferFrames = 32, samplingRate = SAMPLE_RATE;
         initAlsa(deviceNumber, amountChannels, bufferFrames, samplingRate);
         recordForSeconds(10);

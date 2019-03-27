@@ -6,7 +6,7 @@ music visualization on a (acutally four) rgb led matrix with fourier transformat
 
 Here a small gif that shows the output:
 
-![gif][]
+![gif][https://github.com/FelixWeichselgartner/DFTMusicVisualization/blob/master/resources/MyOutput.gif]
 
 *****************************************************************************************
 

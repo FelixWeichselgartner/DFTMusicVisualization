@@ -1,16 +1,14 @@
-*****************************************************************************************
-
 ## DFTMusicVisualization
 
 music visualization on a (acutally four) rgb led matrix with fourier transformation
 
 Here a small gif that shows the output:
 
-![gif][https://github.com/FelixWeichselgartner/DFTMusicVisualization/blob/master/resources/MyOutput.gif]
+![gif](https://github.com/FelixWeichselgartner/DFTMusicVisualization/blob/master/resources/MyOutput.gif)
 
 *****************************************************************************************
 
-### Copyright 2019 Felix Weichselgartner
+### Copyright (c) 2019 Felix Weichselgartner
 
 All rights are reserved.
 
@@ -78,5 +76,3 @@ sudo ./DFTMusicVisualization
 * function principle behind audio files
 * sampling audio files
 * working with ALSA (Advanced Linux Sound Architecture)
-
-*****************************************************************************************

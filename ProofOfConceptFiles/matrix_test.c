@@ -52,7 +52,7 @@ program execution stops and cleans up after itself.
 #define DMA                     10
 #define STRIP_TYPE              WS2811_STRIP_GBR		// WS2812/SK6812RGB integrated chip+leds
 
-#define WIDTH                   8 * 3
+#define WIDTH                   8 * 4
 #define HEIGHT                  8
 #define LED_COUNT               (WIDTH * HEIGHT)
 

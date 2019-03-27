@@ -34,30 +34,31 @@ class Matrix(object):
         self.strip.begin()
 
     def clearMatrix(self):
-        print('led count is ' + str(self.led_count))
+        #print('led count is ' + str(self.led_count))
         for i in range(self.led_count):
-            print(i)
+            #print(i)
             self.strip.setPixelColor(i, Color(0, 0, 0))
             #self.strip.show()
-            time.sleep(self.wait_ms/1000)
+            #time.sleep(self.wait_ms/1000)
         self.strip.show()
     
-    def arrayToMatrix(self, arr):
-        widthOneMatrix = 8
+    def arrayToMatrix(self, arr, amount, width, height, widthOneMatrix):
+        #self.clearMatrix()
         r, start, end = 0, 0, 0
-        for i in range(width/widthOneMatrix, 0, -1):
-            start = (n - 1) * widthOneMatrix * widthOneMatrix + widthOneMatrix - 1
-            end = (n - 1) * widthOneMatrix * widthOneMatrix
-            b = (width / 8 - n) * widthOneMatrix
+        for i in range(amount, 0, -1):
+            start = (i - 1) * widthOneMatrix * widthOneMatrix + widthOneMatrix - 1
+            end = (i - 1) * widthOneMatrix * widthOneMatrix - 1
+            b = (amount - i) * widthOneMatrix
             for k in range(start, end, -1):
                 for l in range(height):
-                    if display[b] > i:
-                        self.strip.setPixelColor(i * widthOneMatrix + k, Color(255, 0, 0))
+                    if arr[b] > l:
+                        self.strip.setPixelColor(l * widthOneMatrix + k, Color(255, 0, 0))
                     else:
-                        self.strip.setPixelColor(i * widthOneMatrix + k, Color(0, 0, 0))
-                self.strip.show()
-                time.sleep(self.wait_ms/1000)
+                        self.strip.setPixelColor(l * widthOneMatrix + k, Color(0, 0, 0))
+                #self.strip.show()
+                #time.sleep(self.wait_ms/1000)
                 b += 1
+        self.strip.show()
 
     def setBrightness(self, value):
         self.strip.setBrightness(value)

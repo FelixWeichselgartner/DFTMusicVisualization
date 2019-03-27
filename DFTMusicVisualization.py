@@ -44,7 +44,7 @@ def maximum(theList):
     return retval
 
 def norm():
-    standardValue = 15
+    standardValue = 25
     norm = standardValue
     #if maximum(display) > standardValue:
     #    norm = max(display)
@@ -58,7 +58,7 @@ def main():
 
     device = 'hw:1'
     inp = alsaaudio.PCM(alsaaudio.PCM_CAPTURE,
-                        alsaaudio.PCM_NONBLOCK, device=device)
+                        alsaaudio.PCM_NORMAL, device=device)
 
     # Set attributes: Mono, 44100 Hz, 16 bit little endian samples
     inp.setchannels(1)
@@ -77,6 +77,9 @@ def main():
 
         for d in data:
             signal.append(d)
+
+        #print(signal)
+        #return
 
         #print('len of signal: ' + str(len(signal)))
         if len(signal) is not 0:

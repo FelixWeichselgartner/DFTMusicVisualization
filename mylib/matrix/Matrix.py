@@ -52,7 +52,7 @@ class Matrix(object):
             for k in range(start, end, -1):
                 for l in range(height):
                     if arr[b] > l:
-                        self.strip.setPixelColor(l * widthOneMatrix + k, Color(255, 0, 0))
+                        self.strip.setPixelColor(l * widthOneMatrix + k, Color(66, 235, 244))
                     else:
                         self.strip.setPixelColor(l * widthOneMatrix + k, Color(0, 0, 0))
                 #self.strip.show()

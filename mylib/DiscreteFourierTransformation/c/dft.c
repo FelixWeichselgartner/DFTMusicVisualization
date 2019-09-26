@@ -96,7 +96,7 @@ float angle(float complex X){
  * @param  N:   the amount of values in the function
  * @retval      pointer to the fourier transformation
  */
-float complex * dft(short *x, int N) {
+float complex * dft(int *x, int N) {
     float complex *X;
     X = malloc(N * sizeof(float complex));
     float complex wExponent = 1*I*(-2)*pi/(N);
@@ -119,12 +119,12 @@ float complex * dft(short *x, int N) {
  * @param  N:   the amount of values in the function
  * @retval      pointer to the fourier transformation
  */
-float complex * fft(short *x, int N) {
+float complex * fft(int *x, int N) {
     int max = N/2;
 
     //decimation in time
-    short *xs = malloc(max * sizeof(short));
-    short *xss = malloc(max * sizeof(short));
+    int *xs = malloc(max * sizeof(int));
+    int *xss = malloc(max * sizeof(int));
 
     for (int k = 0; k < max; k++) {
         xs[k] = x[2*k];

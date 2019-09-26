@@ -36,7 +36,7 @@ void main() {
     XDFT = dft(signal, length);
     printf("DFT: \n");
     ConsoleCArray(XDFT, length);
-    XFFT = fft(signal, length, XFFT);
+    XFFT = fft(signal, length);
     printf("FFT: \n");
     ConsoleCArray(XFFT, length);
     free(signal); free(XDFT); free(XFFT);

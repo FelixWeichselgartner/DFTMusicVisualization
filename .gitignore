@@ -1,0 +1,8 @@
+*.pyc
+resources/
+*.o
+*.so
+lib/rpi_ws281x
+*.log
+*.raw
+.idea
